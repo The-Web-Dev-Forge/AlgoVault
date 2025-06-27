@@ -1,6 +1,5 @@
 /**
  * Caesar Cipher Implementation
- * Based on PDF specification by AYUSH MISHRA 22BCE2160
  * Command line interface for Caesar Cipher encryption/decryption
  */
 
