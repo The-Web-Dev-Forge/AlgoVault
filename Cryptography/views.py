@@ -679,7 +679,7 @@ def diffie_hellman_view(request):
         
         try:
             # Try to use Python fallback directly
-            from Algorithm.Crypto_Fallback.Python.DiffieHellman.diffie_hellman_fallback import diffie_hellman_fallback
+            from Algorithm.Crypto_Fallback.Python.DiffieHellman.DiffieHellman import diffie_hellman_fallback
             
             # Perform Diffie-Hellman key exchange
             result = diffie_hellman_fallback(p, g, alice_private, bob_private)
@@ -741,7 +741,7 @@ def diffie_hellman_process_api(request):
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired, json.JSONDecodeError, Exception) as e:
             # Fall back to Python implementation
             try:
-                from Algorithm.Crypto_Fallback.Python.DiffieHellman.diffie_hellman_fallback import diffie_hellman_fallback
+                from Algorithm.Crypto_Fallback.Python.DiffieHellman.DiffieHellman import diffie_hellman_fallback
                 result = diffie_hellman_fallback(int(p), int(g), int(alice_private), int(bob_private))
                 result_data = {
                     'success': result['success'],

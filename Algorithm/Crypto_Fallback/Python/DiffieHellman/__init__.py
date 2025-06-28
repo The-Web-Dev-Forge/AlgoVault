@@ -4,7 +4,7 @@ Diffie-Hellman Key Exchange Module
 This module provides Python fallback implementation for Diffie-Hellman key exchange.
 """
 
-from .diffie_hellman_fallback import (
+from .DiffieHellman import (
     diffie_hellman_fallback,
     diffie_hellman_key_exchange,
     generate_random_parameters,
