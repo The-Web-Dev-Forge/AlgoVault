@@ -1,6 +1,5 @@
 /**
  * Hill Cipher Implementation
- * Based on PDF specification by AYUSH MISHRA 22BCE2160
  * Command line interface for Hill Cipher encryption/decryption
  */
 
