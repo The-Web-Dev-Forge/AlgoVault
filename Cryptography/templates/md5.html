@@ -1,0 +1,1014 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}MD5 Hash Generator{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/md5.css' %}">
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<main class="main container" id="md5-tool-section">
+    <div class="notification success" id="notification"></div>
+    <section class="cipher-section">
+        <h2 class="section-title">MD5 Hash Generator</h2>
+
+        <div class="input-group">
+            <label for="message">Input Data</label>
+            <textarea id="message" placeholder="Enter text to generate MD5 hash...">{{ input_text|default_if_none:"" }}</textarea>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="output-format">Output Format</label>
+                <select id="output-format">
+                    <option value="hex" {% if output_format == "hex" %}selected{% endif %}>Hexadecimal (lowercase)</option>
+                    <option value="HEX" {% if output_format == "HEX" %}selected{% endif %}>Hexadecimal (uppercase)</option>
+                    <option value="base64" {% if output_format == "base64" %}selected{% endif %}>Base64</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="operation">Operation</label>
+                <select id="operation">
+                    <option value="hash" {% if operation == "hash" %}selected{% endif %}>Generate Hash</option>
+                    <option value="verify" {% if operation == "verify" %}selected{% endif %}>Verify Hash</option>
+                    <option value="analyze" {% if operation == "analyze" %}selected{% endif %}>Hash Analysis</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group" id="verify-hash-section" style="display: none;">
+            <label for="expected-hash">Expected Hash (for verification)</label>
+            <input type="text" id="expected-hash" placeholder="Enter expected MD5 hash...">
+        </div>
+        <div class="btn-group">
+            <button id="process-btn" class="btn tooltip">
+                <span class="btn-text">Generate Hash </span>
+                <span class="btn-icon"><i class="fas fa-cog"></i></span>
+                <span class="tooltiptext">Generate MD5 hash</span>
+            </button>
+            <button id="clear-btn" class="btn btn-secondary tooltip">
+                <span class="btn-text">Clear</span>
+                <span class="btn-icon"><i class="fas fa-eraser"></i></span>
+                <span class="tooltiptext">Reset all fields</span>
+            </button>
+        </div>
+
+        <div class="result-section" id="result-section"{% if result %} style="display:block;"{% else %} style="display:none;"{% endif %}>
+            <h3>Result</h3>
+            <div class="result-box" id="result-output">{% if result %}{{ result }}{% endif %}</div>
+            <button id="copy-btn" class="btn btn-accent copy-btn tooltip">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+                <span class="tooltiptext">Copy result to clipboard</span>
+            </button>
+        </div>
+
+        <div class="shift-visualization" id="hash-visualization" style="display:none;">
+            <h3>MD5 Hash Process Visualization</h3>
+            <p class="visualization-guide">Watch the MD5 algorithm transform your input through multiple processing stages.</p>
+
+            <!-- Character Analysis Section -->
+            <div class="hash-step" id="char-analysis-step">
+                <div class="step-header">
+                    <div class="step-number">0</div>
+                    <h4>Input Character Analysis</h4>
+                    <div class="step-status" id="char-analysis-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="char-analysis">
+                        <div class="analysis-label">Character Mapping:</div>
+                        <div class="alphabet-map" id="alphabet-map">
+                            <!-- Alphabet letters will be dynamically generated -->
+                        </div>
+                    </div>
+                    <div class="char-analysis">
+                        <div class="analysis-label">Input Character Breakdown:</div>
+                        <div class="char-breakdown" id="char-breakdown">
+                            <!-- Character breakdown will appear here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Arrow -->
+            <div class="process-arrow">
+                <div class="arrow-line"></div>
+                <i class="fas fa-arrow-down"></i>
+            </div>
+
+            <!-- Step 1: Input Processing -->
+            <div class="hash-step" id="step-1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h4>Input Processing & Padding</h4>
+                    <div class="step-status" id="step-1-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="input-breakdown">
+                        <div class="data-label">Original Input:</div>
+                        <div id="input-display" class="data-display">Enter text to see breakdown</div>
+                    </div>
+                    <div class="input-breakdown">
+                        <div class="data-label">Binary Representation:</div>
+                        <div id="binary-display" class="data-display binary-text">Binary will appear here</div>
+                    </div>
+                    <div class="input-breakdown">
+                        <div class="data-label">After Padding:</div>
+                        <div id="padded-display" class="data-display binary-text">Padded binary will appear here</div>
+                    </div>
+                    <div class="input-breakdown">
+                        <div class="data-label">Message Length:</div>
+                        <div id="message-length" class="data-display">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Arrow -->
+            <div class="process-arrow">
+                <div class="arrow-line"></div>
+                <i class="fas fa-arrow-down"></i>
+            </div>
+
+            <!-- Step 2: Block Processing -->
+            <div class="hash-step" id="step-2">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h4>512-bit Block Processing</h4>
+                    <div class="step-status" id="step-2-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="block-grid" id="block-grid">
+                        <div class="block-info">Processing 512-bit blocks...</div>
+                    </div>
+                    <div class="round-indicator">
+                        <div class="round-label">Current Round:</div>
+                        <div id="current-round" class="round-display">-</div>
+                        <div class="round-label">/ 64</div>
+                    </div>
+                    <div class="input-breakdown">
+                        <div class="data-label">Block Count:</div>
+                        <div id="block-count" class="data-display">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Arrow -->
+            <div class="process-arrow">
+                <div class="arrow-line"></div>
+                <i class="fas fa-arrow-down"></i>
+            </div>
+
+            <!-- Step 3: Hash State -->
+            <div class="hash-step" id="step-3">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h4>Hash State Evolution</h4>
+                    <div class="step-status" id="step-3-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="hash-registers">
+                        <div class="register">
+                            <div class="register-label">Register A:</div>
+                            <div id="register-a" class="register-value">67452301</div>
+                        </div>
+                        <div class="register">
+                            <div class="register-label">Register B:</div>
+                            <div id="register-b" class="register-value">EFCDAB89</div>
+                        </div>
+                        <div class="register">
+                            <div class="register-label">Register C:</div>
+                            <div id="register-c" class="register-value">98BADCFE</div>
+                        </div>
+                        <div class="register">
+                            <div class="register-label">Register D:</div>
+                            <div id="register-d" class="register-value">10325476</div>
+                        </div>
+                    </div>
+                    <div class="input-breakdown">
+                        <div class="operation-label">Current Operation:</div>
+                        <div id="current-operation" class="data-display">MD5 initialization</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Process Arrow -->
+            <div class="process-arrow">
+                <div class="arrow-line"></div>
+                <i class="fas fa-arrow-down"></i>
+            </div>
+
+            <!-- Step 4: Final Hash -->
+            <div class="hash-step" id="step-4">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <h4>Final Hash Output</h4>
+                    <div class="step-status" id="step-4-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="hash-output">
+                        <div class="output-format">
+                            <div class="format-label">Hex (lowercase):</div>
+                            <div id="hash-hex-lower" class="hash-display">Hash will appear here</div>
+                        </div>
+                        <div class="output-format">
+                            <div class="format-label">Hex (uppercase):</div>
+                            <div id="hash-hex-upper" class="hash-display">Hash will appear here</div>
+                        </div>
+                        <div class="output-format">
+                            <div class="format-label">Base64:</div>
+                            <div id="hash-base64" class="hash-display">Hash will appear here</div>
+                        </div>
+                    </div>
+                    <div class="hash-analysis">
+                        <div class="analysis-label">Hash Properties:</div>
+                        <div id="hash-properties" class="properties-display">
+                            <div class="property">Length: <span id="hash-length">-</span> chars</div>
+                            <div class="property">Entropy: <span id="hash-entropy">-</span> bits</div>
+                            <div class="property">Unique chars: <span id="unique-chars">-</span></div>
+                            <div class="property">Complexity: <span id="hash-complexity">-</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="visualization-info" class="visualization-info">Enter text to see MD5 hash generation process</div>
+        </div>
+    </section>
+
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h3 class="feature-title">Secure Hashing</h3>
+            <p>Generate cryptographic hash values for data integrity and security applications.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3 class="feature-title">Hash Verification</h3>
+            <p>Verify the integrity of data by comparing generated hashes with expected values.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <h3 class="feature-title">Hash Analysis</h3>
+            <p>Gain insights into hash properties, including length, entropy, and character distribution.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-eye"></i>
+            </div>
+            <h3 class="feature-title">Process Visualization</h3>
+            <p>Understand the step-by-step MD5 hashing algorithm with an interactive visualizer.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <h3 class="feature-title">Multiple Formats</h3>
+            <p>Output MD5 hashes in various formats, including hexadecimal (lowercase/uppercase) and Base64.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-code"></i>
+            </div>
+            <h3 class="feature-title">Developer Friendly</h3>
+            <p>Built with clear, modular code, making it easy to integrate and extend for developers.</p>
+        </div>
+    </div>
+
+    <section class="info-section" id="about-md5">
+        <h2 class="section-title">About MD5</h2>
+
+        <div class="info-content">
+            <div class="info-text">
+                <p>MD5 (Message-Digest Algorithm 5) is a widely used cryptographic hash function that produces a 128-bit (16-byte) hash value, typically expressed as a 32-character hexadecimal number. It was designed by Ron Rivest in 1991.</p>
+                <p>Initially designed for use as a cryptographic secure hash algorithm, MD5 has been found to suffer from extensive vulnerabilities, and is no longer recommended for use as a security measure. However, it is still commonly used for checking data integrity and detecting unintentional data corruption.</p>
+                <p>The MD5 algorithm processes data in 512-bit chunks, which are broken down into 16 32-bit words. The output is a set of four 32-bit blocks which combine to form the 128-bit hash. While collisions can be generated, for simple data integrity checks where malicious attacks are not a concern, MD5 can still be a quick and efficient solution.</p>
+            </div>
+            <div class="info-image">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/MD5_algorithm_diagram.svg" alt="MD5 Algorithm Diagram">
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section" id="md5-how-to-use">
+        <h2 class="section-title">How to Use</h2>
+
+        <div class="info-content">
+            <div class="info-text">
+                <ol>
+                    <li><strong>Enter Input Data:</strong> Type or paste the text for which you want to generate an MD5 hash.</li>
+                    <li><strong>Select Output Format:</strong> Choose the desired format for the hash (Hexadecimal lowercase, uppercase, or Base64).</li>
+                    <li><strong>Select Operation:</strong> Choose to 'Generate Hash', 'Verify Hash', or 'Hash Analysis'.
+                        <ul>
+                            <li>For 'Verify Hash', enter the 'Expected Hash' to compare against the generated hash.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Process:</strong> Click the "Process" button to perform the selected operation.</li>
+                    <li><strong>View Result:</strong> The result will appear in the result box below. You can copy it to your clipboard.</li>
+                </ol>
+                <br>
+                <p><strong>Note:</strong> The visualization section shows the internal steps of the MD5 algorithm as you generate a hash.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // MD5 Hash Algorithm Implementation
+    function md5(input) {
+        function safeAdd(x, y) {
+            const lsw = (x & 0xFFFF) + (y & 0xFFFF);
+            const msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+            return (msw << 16) | (lsw & 0xFFFF);
+        }
+
+        function bitRotateLeft(num, cnt) {
+            return (num << cnt) | (num >>> (32 - cnt));
+        }
+
+        function md5cmn(q, a, b, x, s, t) {
+            return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b);
+        }
+
+        function md5ff(a, b, c, d, x, s, t) {
+            return md5cmn((b & c) | ((~b) & d), a, b, x, s, t);
+        }
+
+        function md5gg(a, b, c, d, x, s, t) {
+            return md5cmn((b & d) | (c & (~d)), a, b, x, s, t);
+        }
+
+        function md5hh(a, b, c, d, x, s, t) {
+            return md5cmn(b ^ c ^ d, a, b, x, s, t);
+        }
+
+        function md5ii(a, b, c, d, x, s, t) {
+            return md5cmn(c ^ (b | (~d)), a, b, x, s, t);
+        }
+
+        function binl2hex(binarray) {
+            const hexTab = '0123456789abcdef';
+            let str = '';
+            for (let i = 0; i < binarray.length * 4; i++) {
+                str += hexTab.charAt((binarray[i >> 2] >> ((i % 4) * 8 + 4)) & 0xF) +
+                       hexTab.charAt((binarray[i >> 2] >> ((i % 4) * 8)) & 0xF);
+            }
+            return str;
+        }
+
+        function binl2b64(binarray) {
+            const tab = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+            let str = '';
+            for (let i = 0; i < binarray.length * 4; i += 3) {
+                const triplet = (((binarray[i >> 2] >> 8 * (i % 4)) & 0xFF) << 16) |
+                              (((binarray[i + 1 >> 2] >> 8 * ((i + 1) % 4)) & 0xFF) << 8) |
+                              ((binarray[i + 2 >> 2] >> 8 * ((i + 2) % 4)) & 0xFF);
+                for (let j = 0; j < 4; j++) {
+                    if (i * 8 + j * 6 > binarray.length * 32) str += '=';
+                    else str += tab.charAt((triplet >> 6 * (3 - j)) & 0x3F);
+                }
+            }
+            return str;
+        }
+
+        function str2binl(str) {
+            const bin = [];
+            const mask = (1 << 8) - 1;
+            for (let i = 0; i < str.length * 8; i += 8) {
+                bin[i >> 5] |= (str.charCodeAt(i / 8) & mask) << (i % 32);
+            }
+            return bin;
+        }
+
+        function coreMD5(x, len) {
+            x[len >> 5] |= 0x80 << ((len) % 32);
+            x[(((len + 64) >>> 9) << 4) + 14] = len;
+
+            let a = 1732584193;
+            let b = -271733879;
+            let c = -1732584194;
+            let d = 271733878;
+
+            for (let i = 0; i < x.length; i += 16) {
+                const olda = a, oldb = b, oldc = c, oldd = d;
+
+                // Round 1
+                a = md5ff(a, b, c, d, x[i + 0], 7, -680876936);
+                d = md5ff(d, a, b, c, x[i + 1], 12, -389564586);
+                c = md5ff(c, d, a, b, x[i + 2], 17, 606105819);
+                b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330);
+                a = md5ff(a, b, c, d, x[i + 4], 7, -176418897);
+                d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426);
+                c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341);
+                b = md5ff(b, c, d, a, x[i + 7], 22, -45705983);
+                a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416);
+                d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417);
+                c = md5ff(c, d, a, b, x[i + 10], 17, -42063);
+                b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162);
+                a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682);
+                d = md5ff(d, a, b, c, x[i + 13], 12, -40341101);
+                c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290);
+                b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329);
+
+                // Round 2
+                a = md5gg(a, b, c, d, x[i + 1], 5, -165796510);
+                d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632);
+                c = md5gg(c, d, a, b, x[i + 11], 14, 643717713);
+                b = md5gg(b, c, d, a, x[i + 0], 20, -373897302);
+                a = md5gg(a, b, c, d, x[i + 5], 5, -701558691);
+                d = md5gg(d, a, b, c, x[i + 10], 9, 38016083);
+                c = md5gg(c, d, a, b, x[i + 15], 14, -660478335);
+                b = md5gg(b, c, d, a, x[i + 4], 20, -405537848);
+                a = md5gg(a, b, c, d, x[i + 9], 5, 568446438);
+                d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690);
+                c = md5gg(c, d, a, b, x[i + 3], 14, -187363961);
+                b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501);
+                a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467);
+                d = md5gg(d, a, b, c, x[i + 2], 9, -51403784);
+                c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473);
+                b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734);
+
+                // Round 3
+                a = md5hh(a, b, c, d, x[i + 5], 4, -378558);
+                d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463);
+                c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562);
+                b = md5hh(b, c, d, a, x[i + 14], 23, -35309556);
+                a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060);
+                d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353);
+                c = md5hh(c, d, a, b, x[i + 7], 16, -155497632);
+                b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640);
+                a = md5hh(a, b, c, d, x[i + 13], 4, 681279174);
+                d = md5hh(d, a, b, c, x[i + 0], 11, -358537222);
+                c = md5hh(c, d, a, b, x[i + 3], 16, -722521979);
+                b = md5hh(b, c, d, a, x[i + 6], 23, 76029189);
+                a = md5hh(a, b, c, d, x[i + 9], 4, -640364487);
+                d = md5hh(d, a, b, c, x[i + 12], 11, -421815835);
+                c = md5hh(c, d, a, b, x[i + 15], 16, 530742520);
+                b = md5hh(b, c, d, a, x[i + 2], 23, -995338651);
+
+                // Round 4
+                a = md5ii(a, b, c, d, x[i + 0], 6, -198630844);
+                d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415);
+                c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905);
+                b = md5ii(b, c, d, a, x[i + 5], 21, -57434055);
+                a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571);
+                d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606);
+                c = md5ii(c, d, a, b, x[i + 10], 15, -1051523);
+                b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799);
+                a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359);
+                d = md5ii(d, a, b, c, x[i + 15], 10, -30611744);
+                c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380);
+                b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649);
+                a = md5ii(a, b, c, d, x[i + 4], 6, -145523070);
+                d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379);
+                c = md5ii(c, d, a, b, x[i + 2], 15, 718787259);
+                b = md5ii(b, c, d, a, x[i + 9], 21, -343485551);
+
+                a = safeAdd(a, olda);
+                b = safeAdd(b, oldb);
+                c = safeAdd(c, oldc);
+                d = safeAdd(d, oldd);
+            }
+            return [a, b, c, d];
+        }
+
+        const x = str2binl(input);
+        const len = input.length * 8;
+        return {
+            hex: binl2hex(coreMD5(x, len)),
+            b64: binl2b64(coreMD5(x, len))
+        };
+    }
+
+    // Entropy and complexity calculation functions (same as original)...
+
+    // Visualization and UI update functions (same as original)...
+    
+    // Calculate entropy of a string
+    function calculateEntropy(str) {
+        const len = str.length;
+        const frequencies = {};
+        
+        // Count character frequencies
+        for (let i = 0; i < len; i++) {
+            const char = str[i];
+            frequencies[char] = (frequencies[char] || 0) + 1;
+        }
+        
+        // Calculate entropy
+        let entropy = 0;
+        for (const char in frequencies) {
+            const p = frequencies[char] / len;
+            if (p > 0) {
+                entropy -= p * Math.log2(p);
+            }
+        }
+        
+        return entropy;
+    }
+
+    // Show notification function
+    function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        if (notification) {
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+    }
+
+    // Update visualization function
+    function updateVisualization(input, hash) {
+        const inputDisplay = document.getElementById('input-display');
+        const binaryDisplay = document.getElementById('binary-display');
+        const paddedDisplay = document.getElementById('padded-display');
+        const messageLengthDisplay = document.getElementById('message-length');
+        const blockCountDisplay = document.getElementById('block-count');
+        const hashHexLower = document.getElementById('hash-hex-lower');
+        const hashHexUpper = document.getElementById('hash-hex-upper');
+        const hashBase64 = document.getElementById('hash-base64');
+        const hashLengthSpan = document.getElementById('hash-length');
+        const hashEntropySpan = document.getElementById('hash-entropy');
+        const uniqueCharsSpan = document.getElementById('unique-chars');
+        const hashComplexitySpan = document.getElementById('hash-complexity');
+
+        if (input) {
+            // Create alphabet mapping
+            createAlphabetMapping(input);
+            
+            // Create character breakdown
+            createCharacterBreakdown(input);
+            
+            if (inputDisplay) inputDisplay.textContent = input;
+            
+            // Convert to binary representation
+            if (binaryDisplay) {
+                let binary = '';
+                for (let i = 0; i < input.length; i++) {
+                    binary += input.charCodeAt(i).toString(2).padStart(8, '0') + ' ';
+                }
+                binaryDisplay.textContent = binary.trim();
+                
+                // Show padding simulation
+                if (paddedDisplay) {
+                    const messageBits = input.length * 8;
+                    const paddedBits = Math.ceil((messageBits + 64 + 1) / 512) * 512;
+                    paddedDisplay.textContent = `Message: ${messageBits} bits → Padded: ${paddedBits} bits`;
+                }
+                
+                // Show message length
+                if (messageLengthDisplay) {
+                    messageLengthDisplay.textContent = `${input.length} characters (${input.length * 8} bits)`;
+                }
+                
+                // Show block count
+                if (blockCountDisplay) {
+                    const blockCount = Math.ceil((input.length * 8 + 64 + 1) / 512);
+                    blockCountDisplay.textContent = `${blockCount} block${blockCount !== 1 ? 's' : ''} of 512 bits each`;
+                }
+            }
+            
+            // Update hash displays if hash is provided
+            if (hash) {
+                if (hashHexLower) hashHexLower.textContent = hash.toLowerCase();
+                if (hashHexUpper) hashHexUpper.textContent = hash.toUpperCase();
+                if (hashBase64) {
+                    // Convert hex to base64
+                    try {
+                        const bytes = hash.match(/.{1,2}/g).map(byte => parseInt(byte, 16));
+                        const uint8Array = new Uint8Array(bytes);
+                        const base64 = btoa(String.fromCharCode.apply(null, uint8Array));
+                        hashBase64.textContent = base64;
+                    } catch (e) {
+                        hashBase64.textContent = 'Error converting to Base64';
+                    }
+                }
+                
+                // Update hash properties
+                if (hashLengthSpan) hashLengthSpan.textContent = hash.length;
+                if (hashEntropySpan) {
+                    const entropy = calculateEntropy(hash);
+                    hashEntropySpan.textContent = entropy.toFixed(2);
+                }
+                if (uniqueCharsSpan) {
+                    const uniqueChars = new Set(hash.toLowerCase()).size;
+                    uniqueCharsSpan.textContent = uniqueChars;
+                }
+                if (hashComplexitySpan) {
+                    const entropy = calculateEntropy(hash);
+                    const complexity = entropy > 3.5 ? 'High' : entropy > 2.5 ? 'Medium' : 'Low';
+                    hashComplexitySpan.textContent = complexity;
+                }
+            }
+        } else {
+            // Clear displays
+            if (inputDisplay) inputDisplay.textContent = 'Enter text to see breakdown';
+            if (binaryDisplay) binaryDisplay.textContent = 'Binary will appear here';
+            if (paddedDisplay) paddedDisplay.textContent = 'Padded binary will appear here';
+            if (messageLengthDisplay) messageLengthDisplay.textContent = '-';
+            if (blockCountDisplay) blockCountDisplay.textContent = '-';
+            if (hashHexLower) hashHexLower.textContent = 'Hash will appear here';
+            if (hashHexUpper) hashHexUpper.textContent = 'Hash will appear here';
+            if (hashBase64) hashBase64.textContent = 'Hash will appear here';
+            if (hashLengthSpan) hashLengthSpan.textContent = '-';
+            if (hashEntropySpan) hashEntropySpan.textContent = '-';
+            if (uniqueCharsSpan) uniqueCharsSpan.textContent = '-';
+            if (hashComplexitySpan) hashComplexitySpan.textContent = '-';
+            
+            // Clear alphabet mapping
+            const alphabetMap = document.getElementById('alphabet-map');
+            if (alphabetMap) {
+                alphabetMap.innerHTML = '<div style="color: var(--text-muted); font-style: italic;">Enter text to see character mapping</div>';
+            }
+            
+            // Clear character breakdown
+            const charBreakdown = document.getElementById('char-breakdown');
+            if (charBreakdown) {
+                charBreakdown.innerHTML = '<div style="color: var(--text-muted); font-style: italic;">Character analysis will appear here</div>';
+            }
+        }
+    }
+
+    // Create alphabet mapping visualization
+    function createAlphabetMapping(input) {
+        const alphabetMap = document.getElementById('alphabet-map');
+        if (!alphabetMap) return;
+
+        // Create alphabet letters (0-9, A-F for hex, plus common symbols)
+        const chars = '0123456789ABCDEFabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;:,.<>?';
+        alphabetMap.innerHTML = '';
+
+        // Get unique characters from input
+        const inputChars = new Set(input.toLowerCase());
+
+        chars.split('').forEach(char => {
+            const letterDiv = document.createElement('div');
+            letterDiv.className = 'alphabet-letter';
+            letterDiv.textContent = char;
+
+            // Highlight if character is in input
+            if (inputChars.has(char.toLowerCase())) {
+                letterDiv.classList.add('input-highlight');
+            }
+
+            alphabetMap.appendChild(letterDiv);
+        });
+    }
+
+    // Create character breakdown visualization
+    function createCharacterBreakdown(input) {
+        const charBreakdown = document.getElementById('char-breakdown');
+        if (!charBreakdown) return;
+
+        charBreakdown.innerHTML = '';
+
+        // Count character frequencies
+        const charCount = {};
+        for (let char of input) {
+            charCount[char] = (charCount[char] || 0) + 1;
+        }
+
+        // Create character items
+        Object.entries(charCount).forEach(([char, count]) => {
+            const charItem = document.createElement('div');
+            charItem.className = 'char-item';
+            charItem.innerHTML = `<div style="font-weight: bold;">'${char}'</div><div style="font-size: 0.8rem; color: var(--text-muted);">${count}x</div>`;
+            charBreakdown.appendChild(charItem);
+        });
+    }
+
+    // Animate hash process function
+    function animateHashProcess(input) {
+        const steps = ['char-analysis-step', 'step-1', 'step-2', 'step-3', 'step-4'];
+        const statuses = ['char-analysis-status', 'step-1-status', 'step-2-status', 'step-3-status', 'step-4-status'];
+        
+        // Reset all steps
+        steps.forEach((stepId, index) => {
+            const step = document.getElementById(stepId);
+            const status = document.getElementById(statuses[index]);
+            if (step && status) {
+                step.classList.remove('active', 'completed');
+                status.textContent = '⏳ Waiting';
+            }
+        });
+
+        // Update visualization info
+        const visualizationInfo = document.getElementById('visualization-info');
+        if (visualizationInfo) {
+            visualizationInfo.textContent = 'Processing MD5 hash...';
+            visualizationInfo.classList.add('active');
+        }
+
+        // Animate each step with delay
+        steps.forEach((stepId, index) => {
+            setTimeout(() => {
+                const step = document.getElementById(stepId);
+                const status = document.getElementById(statuses[index]);
+                if (step && status) {
+                    step.classList.add('active');
+                    status.textContent = '🔄 Processing';
+                    
+                    // Special handling for different steps
+                    if (stepId === 'char-analysis-step') {
+                        animateCharacterAnalysis(input);
+                    } else if (stepId === 'step-2') {
+                        animateBlockProcessing();
+                    } else if (stepId === 'step-3') {
+                        animateHashRegisters();
+                    }
+                    
+                    setTimeout(() => {
+                        step.classList.remove('active');
+                        step.classList.add('completed');
+                        status.textContent = '✅ Complete';
+                    }, 1200);
+                }
+            }, index * 1500);
+        });
+
+        // Final completion
+        setTimeout(() => {
+            if (visualizationInfo) {
+                visualizationInfo.textContent = 'MD5 hash generation complete!';
+                visualizationInfo.classList.remove('active');
+            }
+        }, steps.length * 1500 + 1200);
+    }
+
+    // Animate character analysis
+    function animateCharacterAnalysis(input) {
+        const alphabetLetters = document.querySelectorAll('.alphabet-letter');
+        const charItems = document.querySelectorAll('.char-item');
+
+        // Add pulsing effect to input characters
+        alphabetLetters.forEach(letter => {
+            if (letter.classList.contains('input-highlight')) {
+                setTimeout(() => {
+                    letter.style.animation = 'pulse 0.5s ease-in-out';
+                }, Math.random() * 500);
+            }
+        });
+
+        // Animate character items
+        charItems.forEach((item, index) => {
+            setTimeout(() => {
+                item.classList.add('active');
+                setTimeout(() => {
+                    item.classList.remove('active');
+                }, 300);
+            }, index * 100);
+        });
+    }
+
+    // Animate block processing
+    function animateBlockProcessing() {
+        const currentRound = document.getElementById('current-round');
+        if (currentRound) {
+            let round = 0;
+            const interval = setInterval(() => {
+                round += 4;
+                currentRound.textContent = Math.min(round, 64);
+                if (round >= 64) {
+                    clearInterval(interval);
+                }
+            }, 100);
+        }
+    }
+
+    // Animate hash registers
+    function animateHashRegisters() {
+        const registers = ['register-a', 'register-b', 'register-c', 'register-d'];
+        registers.forEach((registerId, index) => {
+            setTimeout(() => {
+                const register = document.getElementById(registerId);
+                if (register) {
+                    register.style.color = 'var(--primary-color)';
+                    register.style.fontWeight = 'bold';
+                    setTimeout(() => {
+                        register.style.color = 'var(--light-color)';
+                        register.style.fontWeight = 'normal';
+                    }, 400);
+                }
+            }, index * 200);
+        });
+
+        // Update current operation
+        const currentOperation = document.getElementById('current-operation');
+        if (currentOperation) {
+            const operations = [
+                'Round 1-16: F functions',
+                'Round 17-32: G functions', 
+                'Round 33-48: H functions',
+                'Round 49-64: I functions',
+                'Finalizing hash state'
+            ];
+            
+            let opIndex = 0;
+            const interval = setInterval(() => {
+                currentOperation.textContent = operations[opIndex];
+                opIndex++;
+                if (opIndex >= operations.length) {
+                    clearInterval(interval);
+                }
+            }, 200);
+        }
+    }
+
+    // Event listeners and main logic (same as original)...
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const messageInput = document.getElementById('message');
+        const outputFormatSelect = document.getElementById('output-format');
+        const operationSelect = document.getElementById('operation');
+        const processBtn = document.getElementById('process-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const resultSection = document.getElementById('result-section');
+        const resultOutput = document.getElementById('result-output');
+        const copyBtn = document.getElementById('copy-btn');
+        const notification = document.getElementById('notification');
+        const verifyHashSection = document.getElementById('verify-hash-section');
+        const expectedHashInput = document.getElementById('expected-hash');
+
+        // Show/hide verify hash input
+        function toggleVerifySection() {
+            if (operationSelect.value === 'verify') {
+                verifyHashSection.style.display = 'block';
+                processBtn.querySelector('.btn-text').textContent = 'Verify Hash ';
+            } else if (operationSelect.value === 'analyze') {
+                verifyHashSection.style.display = 'none';
+                processBtn.querySelector('.btn-text').textContent = 'Analyze Hash ';
+            } else {
+                verifyHashSection.style.display = 'none';
+                processBtn.querySelector('.btn-text').textContent = 'Generate Hash ';
+            }
+        }
+        operationSelect.addEventListener('change', toggleVerifySection);
+        toggleVerifySection();
+
+        // Copy result to clipboard
+        copyBtn.addEventListener('click', () => {
+            const text = resultOutput.textContent;
+            if (!text) {
+                showNotification('No result to copy.', 'error');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Result copied to clipboard!', 'success');
+            }).catch(err => {
+                showNotification('Failed to copy: ' + err, 'error');
+            });
+        });
+
+        // Clear all inputs and outputs
+        clearBtn.addEventListener('click', () => {
+            messageInput.value = '';
+            expectedHashInput.value = '';
+            resultOutput.textContent = '';
+            resultSection.style.display = 'none';
+            verifyHashSection.style.display = 'none';
+            updateVisualization('', '');
+            document.getElementById('hash-visualization').style.display = 'none';
+            notification.style.display = 'none';
+        });
+
+        // Process hash on button click
+        processBtn.addEventListener('click', () => {
+            const input = messageInput.value.trim();
+            const format = outputFormatSelect.value;
+            const operation = operationSelect.value;
+            const expectedHash = expectedHashInput.value.trim();
+
+            if (!input) {
+                showNotification('Please enter text to process.', 'error');
+                return;
+            }
+
+            if (operation === 'verify' && !expectedHash) {
+                showNotification('Please enter expected hash for verification.', 'error');
+                return;
+            }
+
+            // Show processing state
+            const originalText = processBtn.querySelector('.btn-text').textContent;
+            processBtn.querySelector('.btn-text').textContent = 'Processing...';
+            processBtn.disabled = true;
+
+            try {
+                let result = '';
+                
+                if (operation === 'hash') {
+                    const hash = md5(input);
+                    if (format === 'HEX') {
+                        result = hash.hex.toUpperCase();
+                    } else if (format === 'base64') {
+                        result = hash.b64;
+                    } else {
+                        result = hash.hex;
+                    }
+                    updateVisualization(input, hash.hex);
+                    document.getElementById('hash-visualization').style.display = 'block';
+                    animateHashProcess(input);
+                } else if (operation === 'verify') {
+                    const hash = md5(input);
+                    let generatedHash = hash.hex;
+                    if (format === 'HEX') generatedHash = hash.hex.toUpperCase();
+                    else if (format === 'base64') generatedHash = hash.b64;
+
+                    const match = generatedHash.toLowerCase() === expectedHash.toLowerCase();
+                    result = `Verification Result: ${match ? 'MATCH ✅' : 'NO MATCH ❌'}\n\n` +
+                             `Generated Hash: ${generatedHash}\n` +
+                             `Expected Hash:  ${expectedHash}\n` +
+                             `Match Status:   ${match ? 'Verified' : 'Failed'}`;
+                    updateVisualization(input, hash.hex);
+                    document.getElementById('hash-visualization').style.display = 'block';
+                    animateHashProcess(input);
+                } else if (operation === 'analyze') {
+                    const hash = md5(input);
+                    
+                    // Calculate some basic analysis
+                    const entropy = calculateEntropy(hash.hex);
+                    const uniqueChars = new Set(hash.hex).size;
+                    
+                    result = `Hash Analysis Results:\n\n` +
+                             `MD5 Hash: ${hash.hex}\n` +
+                             `Length: ${hash.hex.length} characters\n` +
+                             `Unique Characters: ${uniqueChars}\n` +
+                             `Estimated Entropy: ${entropy.toFixed(2)} bits\n` +
+                             `Hash Strength: ${entropy > 3.5 ? 'Good' : 'Weak'}`;
+                    
+                    updateVisualization(input, hash.hex);
+                    document.getElementById('hash-visualization').style.display = 'block';
+                    animateHashProcess(input);
+                }
+
+                resultOutput.textContent = result;
+                resultSection.style.display = 'block';
+                showNotification('Hash processed successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error processing hash:', error);
+                showNotification('Error processing hash: ' + error.message, 'error');
+            } finally {
+                // Restore button state
+                processBtn.querySelector('.btn-text').textContent = originalText;
+                processBtn.disabled = false;
+            }
+        });
+
+        // Real-time visualization on input change
+        messageInput.addEventListener('input', () => {
+            const input = messageInput.value.trim();
+            if (input) {
+                const hash = md5(input);
+                updateVisualization(input, hash.hex);
+                document.getElementById('hash-visualization').style.display = 'block';
+                
+                // Update the visualization info
+                const visualizationInfo = document.getElementById('visualization-info');
+                if (visualizationInfo) {
+                    visualizationInfo.textContent = `Live preview: MD5 analysis for "${input.substring(0, 20)}${input.length > 20 ? '...' : ''}"`;
+                    visualizationInfo.classList.add('active');
+                }
+            } else {
+                updateVisualization('', '');
+                document.getElementById('hash-visualization').style.display = 'none';
+                resultSection.style.display = 'none';
+                
+                // Reset visualization info
+                const visualizationInfo = document.getElementById('visualization-info');
+                if (visualizationInfo) {
+                    visualizationInfo.textContent = 'Enter text to see MD5 hash generation process';
+                    visualizationInfo.classList.remove('active');
+                }
+            }
+        });
+
+        // Update visualization on output format change
+        outputFormatSelect.addEventListener('change', () => {
+            const input = messageInput.value.trim();
+            if (input) {
+                const hash = md5(input);
+                updateVisualization(input, hash.hex);
+            }
+        });
+
+        // Initialize empty visualization
+        updateVisualization('', '');
+    });
+</script>
+{% endblock %}
