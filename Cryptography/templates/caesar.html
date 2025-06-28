@@ -1,0 +1,237 @@
+<!-- templates/caesar_cipher.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Caesar Cipher Tool{% endblock %}
+
+{% block content %}
+<section class="hero" id="home">
+    <div class="container">
+        <h1>Caesar Cipher Solution</h1>
+        <p>Secure your sensitive communications with military-grade Caesar cipher encryption. Our enterprise solution provides advanced encryption and decryption capabilities with comprehensive security controls and audit capabilities.</p>
+    </div>
+</section>
+
+<main class="main container" id="tools">
+    <div class="notification success" id="notification"></div>
+    
+    <section class="cipher-section">
+        <h2 class="section-title">Caesar Cipher Tool</h2>
+        
+        <!-- The form will submit data to your Django view -->
+        <form method="POST" action="{% url 'process_caesar' %}"> <!-- Replace 'process_caesar' with your URL name -->
+            {% csrf_token %}
+            
+            <div class="input-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" placeholder="Enter your message here...">{{ original_message }}</textarea>
+            </div>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="shift">Shift Value (1-25)</label>
+                    <input type="number" id="shift" name="shift" min="1" max="25" value="{{ shift_value | default:'3' }}">
+                </div>
+                
+                <div class="input-group">
+                    <label for="operation">Operation</label>
+                    <select id="operation" name="operation">
+                        <option value="encrypt" {% if operation == 'encrypt' %}selected{% endif %}>Encrypt</option>
+                        <option value="decrypt" {% if operation == 'decrypt' %}selected{% endif %}>Decrypt</option>
+                        <option value="brute-force" {% if operation == 'brute-force' %}selected{% endif %}>Brute Force Analysis</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="btn-group">
+                <button type="submit" id="process-btn" class="btn tooltip">
+                    <span class="btn-text">Process </span>
+                    <span class="btn-icon"><i class="fas fa-cog"></i></span>
+                    <span class="tooltiptext">Run the cipher operation</span>
+                </button>
+                <button type="reset" id="clear-btn" class="btn btn-secondary tooltip">
+                    <span class="btn-text">Clear</span>
+                    <span class="btn-icon"><i class="fas fa-eraser"></i></span>
+                    <span class="tooltiptext">Reset all fields</span>
+                </button>
+            </div>
+        </form> <!-- End of form -->
+        
+        <!-- Result section populated by Django -->
+        {% if result_text %}
+        <div class="result-section" id="result-section" style="display: block;">
+            <h3>Result</h3>
+            <div class="result-box" id="result-output">{{ result_text }}</div>
+            <button id="copy-btn" class="btn btn-accent copy-btn tooltip">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+                <span class="tooltiptext">Copy result to clipboard</span>
+            </button>
+        </div>
+        {% endif %}
+        
+        <div class="shift-visualization" id="shift-visualization">
+            <h3>Shift Visualization</h3>
+            <p class="visualization-guide">The visualization structure is ready. Client-side JavaScript can be added to animate the shift based on server results.</p>
+            <div id="alphabet-original" class="alphabet-map"></div>
+            <div class="arrow"><i class="fas fa-arrow-down"></i></div>
+            <div id="alphabet-shifted" class="alphabet-map"></div>
+            <div id="visualization-info" class="visualization-info">Enter text and process to see character mapping</div>
+        </div>
+    </section>
+
+    <!-- Static Feature Cards -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-lock"></i></div>
+            <h3 class="feature-title">Secure Encryption</h3>
+            <p>Protect your messages with the classic Caesar cipher encryption method, a foundational technique in cryptography.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-unlock"></i></div>
+            <h3 class="feature-title">Easy Decryption</h3>
+            <p>Decrypt messages that were encrypted using the Caesar cipher with our intuitive decryption tool.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3 class="feature-title">Enterprise Security</h3>
+            <p>Built with enterprise-grade security standards, including secure processing and comprehensive audit logging.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+            <h3 class="feature-title">Advanced Analytics</h3>
+            <p>Perform brute force analysis and frequency studies to test the strength of your encrypted messages.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-eye"></i></div>
+            <h3 class="feature-title">Visual Learning</h3>
+            <p>Understand how the Caesar cipher works with our interactive visualization of the alphabet shift.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-desktop"></i></div>
+            <h3 class="feature-title">Cross-Platform</h3>
+            <p>Access our enterprise encryption tool from any device with a modern web browser. No installation required.</p>
+        </div>
+    </div>
+    
+    <!-- Static Info Sections -->
+    <section class="info-section" id="about">
+        <h2 class="section-title">About Caesar Cipher</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <p>The Caesar cipher is one of the earliest and simplest methods of encryption... (content from original)</p>
+            </div>
+            <div class="info-image">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Caesar_cipher_left_shift_of_3.svg/1200px-Caesar_cipher_left_shift_of_3.svg.png" alt="Caesar Cipher Illustration">
+            </div>
+        </div>
+    </section>
+    <section class="info-section" id="help">
+        <h2 class="section-title">How to Use</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <ol>
+                    <li><strong>Enter Your Message:</strong> Type or paste the text you want to encrypt or decrypt in the message field.</li>
+                    <li><strong>Set Shift Value:</strong> Choose a shift value between 1 and 25.</li>
+                    <li><strong>Select Operation:</strong> Choose whether you want to encrypt, decrypt, or perform brute force analysis.</li>
+                    <li><strong>Process:</strong> Click the "Process" button to perform the operation. The page will reload with the result.</li>
+                    <li><strong>View Result:</strong> The result will appear in the result box below.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Clipboard copy
+    const copyBtn = document.getElementById('copy-btn');
+    const resultOutput = document.getElementById('result-output');
+    if (copyBtn && resultOutput) {
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(resultOutput.textContent)
+                .then(() => alert('Result copied to clipboard!'))
+                .catch(err => alert('Failed to copy.'));
+        });
+    }
+
+    // Alphabet visualization
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const alphabetOriginal = document.getElementById('alphabet-original');
+    const alphabetShifted = document.getElementById('alphabet-shifted');
+    const messageInput = document.getElementById('message');
+    const shiftInput = document.getElementById('shift');
+    const processBtn = document.getElementById('process-btn');
+    const operationSelect = document.getElementById('operation');
+
+    function renderAlphabets(shift, op) {
+        alphabetOriginal.innerHTML = '';
+        alphabetShifted.innerHTML = '';
+        let shifted = '';
+        for (let i = 0; i < alphabet.length; i++) {
+            let idx = op === 'decrypt' ? (i - shift + 26) % 26 : (i + shift) % 26;
+            shifted += alphabet[idx];
+        }
+        for (let i = 0; i < alphabet.length; i++) {
+            let div = document.createElement('div');
+            div.className = 'alphabet-letter';
+            div.textContent = alphabet[i];
+            div.dataset.letter = alphabet[i];
+            alphabetOriginal.appendChild(div);
+        }
+        for (let i = 0; i < shifted.length; i++) {
+            let div = document.createElement('div');
+            div.className = 'alphabet-letter';
+            div.textContent = shifted[i];
+            div.dataset.letter = shifted[i];
+            alphabetShifted.appendChild(div);
+        }
+    }
+
+    function highlightMapping(msg, shift, op) {
+        // Remove previous highlights
+        document.querySelectorAll('.alphabet-letter').forEach(el => {
+            el.classList.remove('input-highlight');
+        });
+        msg = msg.toUpperCase();
+        for (let i = 0; i < msg.length; i++) {
+            let c = msg[i];
+            let idx = alphabet.indexOf(c);
+            if (idx !== -1) {
+                // Highlight input letter
+                let orig = alphabetOriginal.children[idx];
+                if (orig) orig.classList.add('input-highlight');
+                // Highlight shifted letter (corrected logic)
+                let shiftedIdx = op === 'decrypt' ? (idx - shift + 26) % 26 : (idx + shift) % 26;
+                let shifted = alphabetShifted.children[idx]; // highlight at the same position as input
+                if (shifted) shifted.classList.add('input-highlight');
+            }
+        }
+    }
+
+    function updateVisualization() {
+        let shift = parseInt(shiftInput.value) || 3;
+        let op = operationSelect.value;
+        renderAlphabets(shift, op);
+        let msg = messageInput.value;
+        highlightMapping(msg, shift, op);
+    }
+
+    // Initial render
+    updateVisualization();
+
+    // Update on input
+    shiftInput.addEventListener('input', updateVisualization);
+    operationSelect.addEventListener('change', updateVisualization);
+    messageInput.addEventListener('input', updateVisualization);
+
+    // Highlight on process
+    if (processBtn) {
+        processBtn.addEventListener('click', function(e) {
+            setTimeout(updateVisualization, 100); // Wait for result to update
+        });
+    }
+});
+</script>
+{% endblock %}
