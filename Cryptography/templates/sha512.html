@@ -1,0 +1,526 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}CipherPro | SHA-512 Hash Tool{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/sha512.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="hero" id="home">
+    <div class="container">
+        <h1>SHA-512 Hash Solution</h1>
+        <p>Generate secure SHA-512 hashes for your data with a detailed, interactive visualization of the hashing process.</p>
+    </div>
+</section>
+
+<main class="main container" id="tools">
+    <div class="notification" id="notification"></div>
+
+    <section class="cipher-section">
+        <h2 cl``1ass="section-title">SHA-512 Hash Tool</h2>
+        <div class="input-group">
+            <label for="sha512-message">Message</label>
+            <textarea id="sha512-message" placeholder="Enter your message here..."></textarea>
+        </div>
+        <div class="btn-group">
+            <button id="sha512-hash-btn" class="btn tooltip">
+                <span class="btn-text">Generate Hash</span>
+                <i class="fas fa-cog"></i>
+            </button>
+            <button id="sha512-clear-btn" class="btn btn-secondary tooltip">
+                <span class="btn-text">Clear</span>
+                <i class="fas fa-eraser"></i>
+            </button>
+        </div>
+
+        <div class="result-section" id="sha512-result-section">
+            <h3>Result</h3>
+            <div class="result-box" id="sha512-result-output"></div>
+            <button id="sha512-copy-btn" class="btn copy-btn" style="margin-top: 1rem;">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+            </button>
+
+            <!-- Static block visualization with padding info -->
+            <div id="sha512-block-info"></div>
+
+            <!-- Animated process visualization -->
+            <div id="sha512-process-visualization" class="sha512-visualization">
+                <div class="sha512-block-diagram-title">SHA-512 Processing Flow</div>
+                <div class="sha512-blocks-scroll">
+                    <div class="sha512-blocks"></div>
+                </div>
+                <div class="sha512-detail-view">
+                    <div class="sha512-detail-title">Round Details</div>
+                    <div id="round-detail-container">
+                        <div class="round-counter">Round: <span id="current-round">0</span>/80</div>
+                        <div class="variables-container">
+                            <div class="variable-row">
+                                <div class="variable-label">a:</div>
+                                <div class="variable-value" id="var-a">-</div>
+                            </div>
+                            <div class="variable-row">
+                                <div class="variable-label">b:</div>
+                                <div class="variable-value" id="var-b">-</div>
+                            </div>
+                            <div class="variable-row">
+                                <div class="variable-label">c:</div>
+                                <div class="variable-value" id="var-c">-</div>
+                            </div>
+                            <div class="variable-row">
+                                <div class="variable-label">d:</div>
+                                <div class="variable-value" id="var-d">-</div>
+                            </div>
+                            <div class="variable-row">
+                                <div class="variable-label">e:</div>
+                                <div class="variable-value" id="var-e">-</div>
+                            </div>
+                            <div class="variable-row">
+                                <div class="variable-label">f:</div>
+                                <div class="variable-value" id="var-f">-</div>
+                            </div>
+                            <div class="variable-row">
+                                <div class="variable-label">g:</div>
+                                <div class="variable-value" id="var-g">-</div>
+                            </div>
+                            <div class="variable-row">
+                                <div class="variable-label">h:</div>
+                                <div class="variable-value" id="var-h">-</div>
+                            </div>
+                        </div>
+                        <div class="round-operations">
+                            <div class="operation-row">
+                                <div class="operation-label">T1 = h + Σ1(e) + Ch(e,f,g) + K[t] + W[t]</div>
+                                <div class="operation-value" id="t1-value">-</div>
+                            </div>
+                            <div class="operation-row">
+                                <div class="operation-label">T2 = Σ0(a) + Maj(a,b,c)</div>
+                                <div class="operation-value" id="t2-value">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sha512-controls">
+                    <button id="prev-step" disabled>Previous Step</button>
+                    <button id="prev-round" disabled>Previous Round</button>
+                    <button id="play-animation">Play Animation</button>
+                    <button id="next-round" disabled>Next Round</button>
+                    <button id="next-step" disabled>Next Step</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Cards for SHA-512 -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3 class="feature-title">Secure Hashing</h3>
+            <p>Utilizes the SHA-512 algorithm, part of the SHA-2 family, to produce a robust 512-bit hash for maximum security.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-check-circle"></i></div>
+            <h3 class="feature-title">Data Integrity</h3>
+            <p>Verify that your data has not been altered. Any change to the input message results in a completely different hash.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-arrow-right"></i></div>
+            <h3 class="feature-title">One-Way Function</h3>
+            <p>SHA-512 is a one-way function, meaning the original message cannot be reverse-engineered from its hash output.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-ruler-horizontal"></i></div>
+            <h3 class="feature-title">Fixed-Size Output</h3>
+            <p>Regardless of the input message size, the SHA-512 algorithm always produces a fixed 512-bit (128 hex characters) output.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-random"></i></div>
+            <h3 class="feature-title">Avalanche Effect</h3>
+            <p>A minor change in the input (e.g., a single character) will cause a drastic and unpredictable change in the output hash.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-certificate"></i></div>
+            <h3 class="feature-title">Industry Standard</h3>
+            <p>Widely used in modern security protocols, including digital signatures, blockchain technology, and secure password storage.</p>
+        </div>
+    </div>
+    
+    <!-- Info Sections for SHA-512 -->
+    <section class="info-section" id="about">
+        <h2 class="section-title">About SHA-512</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <p>The Secure Hash Algorithm 512 (SHA-512) is a cryptographic hash function and a member of the SHA-2 family, designed by the United States National Security Agency (NSA). A hash function takes an input of any length and produces a fixed-size string of characters, which is the hash value.</p>
+                <p>SHA-512 generates a 512-bit (64-byte) hash, typically rendered as a 128-character hexadecimal number. It is computationally infeasible to find two different messages that hash to the same value (collision resistance) or to find a message that produces a given hash (preimage resistance). This makes it ideal for verifying data integrity and hashing passwords.</p>
+            </div>
+            <div class="info-image">
+                <img src="https://i.stack.imgur.com/32G53.png" alt="SHA-512 Algorithm Structure">
+            </div>
+        </div>
+    </section>
+    <section class="info-section" id="help">
+        <h2 class="section-title">How to Use</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <ol>
+                    <li><strong>Enter Your Message:</strong> Type or paste the text you want to hash into the message field.</li>
+                    <li><strong>Generate Hash:</strong> Click the "Generate Hash" button to perform the hashing operation. The page will process your input and display the result.</li>
+                    <li><strong>View and Copy Result:</strong> The resulting 512-bit hash will appear in the result box. You can use the "Copy to Clipboard" button for convenience.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Elements ---
+    const messageInput = document.getElementById('sha512-message');
+    const hashBtn = document.getElementById('sha512-hash-btn');
+    const clearBtn = document.getElementById('sha512-clear-btn');
+    const resultSection = document.getElementById('sha512-result-section');
+    const resultOutput = document.getElementById('sha512-result-output');
+    const copyBtn = document.getElementById('sha512-copy-btn');
+    const blockInfoViz = document.getElementById('sha512-block-info');
+    const blocksContainer = document.querySelector('.sha512-blocks');
+    const prevStepBtn = document.getElementById('prev-step');
+    const nextStepBtn = document.getElementById('next-step');
+    const playBtn = document.getElementById('play-animation');
+
+    // --- CSRF Token Helper ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // --- Notification Function (from base.html) ---
+    function showNotification(msg, type) {
+        const notification = document.getElementById('notification');
+        if (!notification) return;
+        notification.textContent = msg;
+        notification.className = 'notification ' + type;
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
+    // --- Hashing Logic (via Python Backend) ---
+    async function getHashFromBackend(message) {
+        hashBtn.disabled = true;
+        hashBtn.innerHTML = '<span class="btn-text">Hashing...</span><i class="fas fa-spinner fa-spin"></i>';
+        try {
+            const response = await fetch('/api/sha512/process/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                body: JSON.stringify({ message: message })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Unknown backend error.');
+            return data.result;
+        } catch (error) {
+            showNotification(`Error: ${error.message}`, 'error');
+            return null;
+        } finally {
+            hashBtn.disabled = false;
+            hashBtn.innerHTML = '<span class="btn-text">Generate Hash</span><i class="fas fa-cog"></i>';
+        }
+    }
+
+    // --- Visualization Logic (Client-Side) ---
+    let currentStep = 0;
+    let currentRound = 0;
+    let totalBlocks = 0;
+    let intervalId = null;
+    
+    // Mock data for SHA-512 process visualization
+    const mockVariables = {
+        initialState: {
+            a: '6a09e667f3bcc908', b: 'bb67ae8584caa73b', c: '3c6ef372fe94f82b', d: 'a54ff53a5f1d36f1',
+            e: '510e527fade682d1', f: '9b05688c2b3e6c1f', g: '1f83d9abfb41bd6b', h: '5be0cd19137e2179'
+        },
+        roundData: []
+    };
+    
+    // Generate mock round data for visualization
+    function generateMockRoundData() {
+        mockVariables.roundData = [];
+        let current = {...mockVariables.initialState};
+        
+        for (let t = 0; t < 80; t++) {
+            // Generate random but visually realistic T1 and T2 values
+            const t1 = Math.floor(Math.random() * 9007199254740991).toString(16).padStart(16, '0');
+            const t2 = Math.floor(Math.random() * 9007199254740991).toString(16).padStart(16, '0');
+            
+            // Save current state
+            const prevState = {...current};
+            
+            // Update state according to SHA-512 algorithm
+            const h = current.g;
+            const g = current.f;
+            const f = current.e;
+            const e = (BigInt('0x' + current.d) + BigInt('0x' + t1)).toString(16).slice(-16);
+            const d = current.c;
+            const c = current.b;
+            const b = current.a;
+            const a = (BigInt('0x' + t1) + BigInt('0x' + t2)).toString(16).slice(-16);
+            
+            current = {a, b, c, d, e, f, g, h};
+            
+            mockVariables.roundData.push({
+                round: t,
+                t1, t2,
+                prevState, 
+                newState: {...current}
+            });
+        }
+    }
+    
+    function getSHA512PaddingInfo(str) {
+        const bitLen = new TextEncoder().encode(str).length * 8;
+        const blockSize = 1024;
+        const lenSize = 128;
+        let totalLen = bitLen + 1 + lenSize;
+        let padLen = (blockSize - (totalLen % blockSize)) % blockSize;
+        return { bitLen, padLen, totalPadded: bitLen + 1 + padLen + lenSize, numBlocks: (bitLen + 1 + padLen + lenSize) / blockSize };
+    }
+
+    function renderStaticBlockInfo(str) {
+        const { bitLen, padLen, totalPadded, numBlocks } = getSHA512PaddingInfo(str);
+        let html = `<div>
+            <strong>Input bit length:</strong> ${bitLen} bits<br>
+            <strong>Padding added:</strong> 1 '1' bit, ${padLen} '0' bits, and a 128-bit length block.<br>
+            <strong>Total padded length:</strong> ${totalPadded} bits<br>
+            <strong>Number of 1024-bit blocks:</strong> ${numBlocks}
+        </div>`;
+        html += '<div class="static-blocks-container">';
+        for (let i = 0; i < numBlocks; i++) {
+            const isLast = i === numBlocks - 1;
+            html += `<div class="static-block">
+                <div class="block-title">Block ${i+1}</div>
+                <div class="block-size">1024 bits</div>`;
+            if (isLast) {
+                html += `<div class="padding-info">Contains Padding</div>`;
+            }
+            html += '</div>';
+        }
+        html += '</div>';
+        blockInfoViz.innerHTML = html;
+    }
+
+    function setupAnimatedVisualization(blocksCount) {
+        totalBlocks = blocksCount;
+        currentStep = 0;
+        currentRound = 0;
+        if (intervalId) clearInterval(intervalId);
+
+        // Generate visualization data
+        generateMockRoundData();
+
+        // Create block visualization
+        blocksContainer.innerHTML = '';
+        for (let i = 0; i < totalBlocks; i++) {
+            const blockEl = document.createElement('div');
+            blockEl.className = 'sha512-block';
+            blockEl.innerHTML = `
+                <div class="block-number">Block ${i+1}</div>
+                <div class="block-diagram">
+                    <div class="sha512-message">
+                        <span class="sha512-label">Message Block (M<sub>${i+1}</sub>)</span>
+                        <div class="sha512-message-content">1024 bits</div>
+                    </div>
+                    <div class="sha512-arrow">&#8595;</div>
+                    <div class="sha512-expansion">
+                        <span class="sha512-label">Message Schedule</span>
+                        <div class="sha512-expansion-content">W[0...79]</div>
+                    </div>
+                    <div class="sha512-arrow">&#8595;</div>
+                    <div class="sha512-compression">
+                        <span class="sha512-label">Compression Function</span>
+                        <div class="sha512-compression-content">80 Rounds</div>
+                    </div>
+                    <div class="sha512-arrow">&#8595;</div>
+                    <div class="sha512-addition">
+                        <span class="sha512-label">Addition</span>
+                        <div class="sha512-addition-content">H<sub>${i}</sub> + Output</div>
+                    </div>
+                    <div class="sha512-arrow">&#8595;</div>
+                    <div class="sha512-result">
+                        <span class="sha512-label">Intermediate Hash</span>
+                        <div class="sha512-result-content">H<sub>${i+1}</sub></div>
+                    </div>
+                </div>
+            `;
+            blocksContainer.appendChild(blockEl);
+
+            if (i < totalBlocks - 1) {
+                const arrowEl = document.createElement('div');
+                arrowEl.className = 'sha512-block-connector';
+                arrowEl.innerHTML = `<svg width="48" height="30" viewBox="0 0 48 30">
+                    <defs><marker id="arrowhead" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--primary-color)"></path></marker></defs>
+                    <line x1="0" y1="15" x2="42" y2="15" stroke="var(--primary-color)" stroke-width="2" marker-end="url(#arrowhead)"></line>
+                </svg>`;
+                blocksContainer.appendChild(arrowEl);
+            }
+        }
+        
+        // Setup control buttons
+        document.getElementById('prev-step').onclick = () => moveStep(-1);
+        document.getElementById('next-step').onclick = () => moveStep(1);
+        document.getElementById('prev-round').onclick = () => moveRound(-1);
+        document.getElementById('next-round').onclick = () => moveRound(1);
+        document.getElementById('play-animation').onclick = playAnimation;
+        
+        // Initialize state
+        updateActiveBlock();
+        updateRoundDisplay();
+    }
+    
+    function updateActiveBlock() {
+        const blocks = blocksContainer.querySelectorAll('.sha512-block');
+        blocks.forEach((block, index) => {
+            block.classList.toggle('active', index === currentStep);
+        });
+        
+        const connectors = blocksContainer.querySelectorAll('.sha512-block-connector');
+        connectors.forEach((connector, index) => {
+            connector.classList.toggle('active', index === currentStep);
+        });
+        
+        updateControls();
+        scrollToActiveBlock();
+    }
+
+    function updateRoundDisplay() {
+        if (currentStep >= totalBlocks) return;
+        
+        document.getElementById('current-round').textContent = currentRound;
+        
+        // If we're in a valid block and round
+        if (currentRound < 80) {
+            const roundData = mockVariables.roundData[currentRound];
+            
+            // Update variable displays
+            document.getElementById('var-a').textContent = roundData.newState.a;
+            document.getElementById('var-b').textContent = roundData.newState.b;
+            document.getElementById('var-c').textContent = roundData.newState.c;
+            document.getElementById('var-d').textContent = roundData.newState.d;
+            document.getElementById('var-e').textContent = roundData.newState.e;
+            document.getElementById('var-f').textContent = roundData.newState.f;
+            document.getElementById('var-g').textContent = roundData.newState.g;
+            document.getElementById('var-h').textContent = roundData.newState.h;
+            
+            // Update operation values
+            document.getElementById('t1-value').textContent = roundData.t1;
+            document.getElementById('t2-value').textContent = roundData.t2;
+        }
+    }
+
+    function updateControls() {
+        document.getElementById('prev-step').disabled = (currentStep === 0);
+        document.getElementById('next-step').disabled = (currentStep >= totalBlocks - 1);
+        document.getElementById('prev-round').disabled = (currentRound === 0);
+        document.getElementById('next-round').disabled = (currentRound >= 79);
+        document.getElementById('play-animation').disabled = (currentStep >= totalBlocks - 1 && currentRound >= 79);
+    }
+
+    function moveStep(direction) {
+        if (intervalId) clearInterval(intervalId);
+        currentStep = Math.max(0, Math.min(totalBlocks - 1, currentStep + direction));
+        currentRound = 0; // Reset round when changing block
+        updateActiveBlock();
+        updateRoundDisplay();
+    }
+    
+    function moveRound(direction) {
+        if (intervalId) clearInterval(intervalId);
+        currentRound = Math.max(0, Math.min(79, currentRound + direction));
+        updateRoundDisplay();
+        updateControls();
+    }
+
+    function playAnimation() {
+        if (intervalId) clearInterval(intervalId);
+        
+        document.getElementById('play-animation').disabled = true;
+        
+        intervalId = setInterval(() => {
+            // Advance the round first
+            if (currentRound < 79) {
+                currentRound++;
+                updateRoundDisplay();
+                updateControls();
+            } 
+            // If at last round, advance to next block
+            else if (currentStep < totalBlocks - 1) {
+                currentStep++;
+                currentRound = 0;
+                updateActiveBlock();
+                updateRoundDisplay();
+            } 
+            // If at last block and last round, stop animation
+            else {
+                clearInterval(intervalId);
+                document.getElementById('play-animation').disabled = false;
+            }
+        }, 800);
+    }
+
+    function scrollToActiveBlock() {
+        const activeBlock = document.querySelector('.sha512-block.active');
+        if (activeBlock) {
+            activeBlock.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
+    // --- Event Handlers ---
+    hashBtn.addEventListener('click', async () => {
+        const message = messageInput.value;
+        if (!message) {
+            showNotification('Please enter a message.', 'error');
+            return;
+        }
+        
+        const hash = await getHashFromBackend(message);
+        if (hash) {
+            resultOutput.textContent = hash;
+            resultSection.style.display = 'block';
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+            
+            // Trigger BOTH visualizations
+            renderStaticBlockInfo(message);
+            const { numBlocks } = getSHA512PaddingInfo(message);
+            setupAnimatedVisualization(numBlocks);
+        }
+    });
+
+    clearBtn.addEventListener('click', () => {
+        messageInput.value = '';
+        resultSection.style.display = 'none';
+        blockInfoViz.innerHTML = '';
+        blocksContainer.innerHTML = '';
+        if (intervalId) clearInterval(intervalId);
+    });
+
+    copyBtn.addEventListener('click', () => {
+        if (!resultOutput.textContent) return;
+        navigator.clipboard.writeText(resultOutput.textContent)
+            .then(() => showNotification('Result copied!', 'success'))
+            .catch(() => showNotification('Failed to copy.', 'error'));
+    });
+});
+</script>
+{% endblock %}
