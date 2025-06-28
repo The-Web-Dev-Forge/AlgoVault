@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AES Encryption & Decryption Tool | CipherPro{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/aes.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="hero" id="home">
+    <div class="container">
+        <h1>AES  Solution</h1>
+        <p>Secure your sensitive communications with military-grade AES (Advanced Encryption Standard). This tool provides detailed visualization of the encryption and decryption process.</p>
+    </div>
+</section>
+
+<main class="main container" id="tools">
+    <div class="notification success" id="notification"></div>
+    
+    <section class="cipher-section">
+        <h2 class="section-title">AES Encryption & Decryption Tool</h2>
+        
+        {% if error %}
+            <div class="notification error" style="display: block;">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="{% url 'aes' %}">
+            {% csrf_token %}
+            <div class="input-group">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" placeholder="Enter your message here to encrypt or decrypt..." required>{{ message|default:'' }}</textarea>
+            </div>
+            
+            <div class="input-group">
+                <label for="key">16-Character Encryption Key</label>
+                <input type="text" id="key" name="key" placeholder="Enter exactly 16 characters for the key" value="{{ key|default:'' }}" required maxlength="16" minlength="16">
+            </div>
+            
+            <div class="input-group">
+                <label for="operation">Operation</label>
+                <select id="operation" name="operation">
+                    <option value="encrypt" {% if operation == 'encrypt' %}selected{% endif %}>Encrypt</option>
+                    <option value="decrypt" {% if operation == 'decrypt' %}selected{% endif %}>Decrypt</option>
+                </select>
+            </div>
+            
+            <div class="btn-group">
+                <button type="submit" class="btn">
+                    <span class="btn-text">Process </span>
+                    <span class="btn-icon"><i class="fas fa-cog"></i></span>
+                </button>
+            </div>
+        </form>
+        
+        {% if is_post and result %}
+        <div class="result-section" id="result-section">
+            <h3>Result</h3>
+            <div class="result-box" id="result-output">{{ result }}</div>
+            <button type="button" id="copy-btn" class="btn btn-accent copy-btn">
+                <i class="fas fa-copy"></i> Copy Result
+            </button>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- AES Visualization Section -->
+    {% if blocks_data %}
+    <section class="aes-visualization">
+        <h2 class="section-title">{{ operation|capfirst }}ion Visualization</h2>
+        
+        {% for block in blocks_data %}
+        <div class="aes-block">
+            <h3 class="aes-block-title">Block {{ block.block }}</h3>
+            {% for round in block.rounds %}
+            <div class="aes-round">
+                <h4 class="aes-round-title">Round {{ round.round }}</h4>
+                <div class="aes-steps-container">
+                    
+                    <div class="aes-step">
+                        <h5 class="aes-step-title">Start of Round</h5>
+                        <div class="aes-state-grid">{% for row in round.startOfRound_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
+                    </div>
+
+                    {% if operation == 'encrypt' %}
+                    <div class="aes-step">
+                        <h5 class="aes-step-title">After SubBytes</h5>
+                        <div class="aes-state-grid">{% for row in round.afterSubBytes_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
+                    </div>
+                    <div class="aes-step">
+                        <h5 class="aes-step-title">After ShiftRows</h5>
+                        <div class="aes-state-grid">{% for row in round.afterShiftRows_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
+                    </div>
+                    <div class="aes-step">
+                        <h5 class="aes-step-title">After MixColumns</h5>
+                        {% if round.round == 10 %}<p class="step-note">(Skipped)</p>{% endif %}
+                        <div class="aes-state-grid">{% for row in round.afterMixColumns_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
+                    </div>
+                    <div class="aes-step">
+                        <h5 class="aes-step-title">After AddRoundKey</h5>
+                        <div class="aes-state-grid">{% for row in round.afterAddRoundKey_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
+                    </div>
+                    {% else %} {# Decryption order #}
+                    <div class="aes-step">
+                        <h5 class="aes-step-title">After Inv. ShiftRows</h5>
+                        <div class="aes-state-grid">{% for row in round.afterInvShiftRows_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
+                    </div>
+                    <div class="aes-step">
+                        <h5 class="aes-step-title">After Inv. SubBytes</h5>
+                        <div class="aes-state-grid">{% for row in round.afterInvSubBytes_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
+                    </div>
+                    <div class="aes-step">
+                        <h5 class="aes-step-title">After AddRoundKey</h5>
+                        <div class="aes-state-grid">{% for row in round.afterAddRoundKey_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
+                    </div>
+                    <div class="aes-step">
+                        <h5 class="aes-step-title">After Inv. MixColumns</h5>
+                         {% if round.round == 10 %}<p class="step-note">(Skipped)</p>{% endif %}
+                        <div class="aes-state-grid">{% for row in round.afterInvMixColumns_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </section>
+    {% endif %}
+    
+    <!-- Final Result Summary -->
+    {% if is_post and result %}
+    <section class="final-result-section">
+        <h2 class="section-title">Final {{ operation|capfirst }}ion Result</h2>
+        <div class="final-result-container">
+            <div class="final-result-header">
+                <h3>
+                    {% if operation == 'encrypt' %}
+                        <i class="fas fa-lock"></i> Encrypted Data
+                    {% else %}
+                        <i class="fas fa-unlock"></i> Decrypted Data
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="final-result-content">
+                <div class="result-summary">
+                    <div class="final-result-box">{{ result }}</div>
+                    <button type="button" class="btn btn-accent copy-final-btn">
+                        <i class="fas fa-copy"></i> Copy Final Result
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Static Feature Cards -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-lock"></i></div>
+            <h3 class="feature-title">Military-Grade Encryption</h3>
+            <p>Utilizes the Advanced Encryption Standard (AES), one of the most secure and widely adopted symmetric-key algorithms globally, approved for top secret government information.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-cube"></i></div>
+            <h3 class="feature-title">Block Cipher Processing</h3>
+            <p>Processes data in 128-bit (16-byte) blocks, ensuring high efficiency and robust security for bulk data encryption and decryption.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-key"></i></div>
+            <h3 class="feature-title">Strong Key Schedule</h3>
+            <p>Employs a sophisticated key expansion algorithm to derive multiple unique round keys from your single 128-bit master key, enhancing cryptographic strength.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-sitemap"></i></div>
+            <h3 class="feature-title">Detailed Visualization</h3>
+            <p>Experience an in-depth, step-by-step visualization of each AES round (SubBytes, ShiftRows, MixColumns, AddRoundKey) for educational insight into the process.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-code"></i></div>
+            <h3 class="feature-title">Transparent Implementation</h3>
+            <p>Our tool uses a custom Java implementation of AES-128, allowing for full transparency and a deeper understanding of the underlying cryptographic operations.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+            <h3 class="feature-title">Inverse Operations Explained</h3>
+            <p>Visualize the inverse operations during decryption, illustrating how data is meticulously returned to its original plaintext form.</p>
+        </div>
+    </div>
+    
+    <!-- Static Info Sections -->
+    <section class="info-section" id="about">
+        <h2 class="section-title">About AES Encryption</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <p>The Advanced Encryption Standard (AES) is a symmetric block cipher selected by the U.S. National Institute of Standards and Technology (NIST) in 2001. It replaced the Data Encryption Standard (DES) as the federal government's standard for encrypting sensitive data.</p>
+                <p>AES operates on fixed-size blocks of 128 bits and uses key sizes of 128, 192, or 256 bits. This tool specifically implements AES-128, which means it uses a 128-bit (16-byte) key and performs 10 rounds of encryption/decryption.</p>
+                <p>Each round consists of several transformations: SubBytes, ShiftRows, MixColumns (skipped in the last round), and AddRoundKey. These operations, combined with a robust key schedule, ensure strong diffusion and confusion, making AES highly resistant to various cryptographic attacks.</p>
+            </div>
+            <div class="info-image">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/AES-SubBytes.svg/1200px-AES-SubBytes.svg.png" alt="AES SubBytes Operation" style="background: white; padding: 20px; border-radius: 8px;">
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section" id="how-to-use">
+        <h2 class="section-title">How to Use the AES Tool</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <ol>
+                    <li><strong>Enter Your Message:</strong> In the "Message" text area, type or paste the text you want to encrypt or the Base64-encoded ciphertext you want to decrypt.</li>
+                    <li><strong>Provide Your Key:</strong> Enter your 16-character (128-bit) secret key in the "16-Character Encryption Key" field. This key is crucial for both encryption and decryption.</li>
+                    <li><strong>Select Operation:</strong> Choose "Encrypt" if you want to convert your plaintext into ciphertext, or "Decrypt" if you want to convert ciphertext back into plaintext.</li>
+                    <li><strong>Process:</strong> Click the "Process" button. The tool will execute the AES algorithm and display the final result.</li>
+                    <li><strong>View Visualization:</strong> Scroll down to the "Encryption/Decryption Visualization" section to see the detailed, step-by-step transformation of your data through each round of AES.</li>
+                    <li><strong>Copy Results:</strong> Use the "Copy Result" buttons to easily copy the intermediate or final output to your clipboard.</li>
+                </ol>
+            </div>
+            <div class="info-image">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/AES_Encryption.svg/1024px-AES_Encryption.svg.png" alt="AES Workflow" style="background: white; padding: 20px; border-radius: 8px;">
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const copyBtn = document.getElementById('copy-btn');
+    const notification = document.getElementById('notification');
+    const copyFinalBtn = document.querySelector('.copy-final-btn');
+
+    function showNotification(message, type) {
+        if (!notification) return;
+        notification.textContent = message;
+        notification.className = 'notification ' + type;
+        notification.style.display = 'block';
+        notification.style.opacity = '0'; // Start with opacity 0 for fade-in
+        setTimeout(() => { notification.style.opacity = '1'; }, 10); // Trigger fade-in
+
+        setTimeout(() => { 
+            notification.style.opacity = '0'; 
+            setTimeout(() => { notification.style.display = 'none'; }, 300); // Hide after fade-out
+        }, 3000);
+    }
+    
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            const resultOutput = document.getElementById('result-output');
+            navigator.clipboard.writeText(resultOutput.textContent).then(function() {
+                showNotification('Result copied to clipboard!', 'success');
+            }, function(err) {
+                showNotification('Could not copy text: ' + err, 'error');
+            });
+        });
+    }
+    
+    if (copyFinalBtn) {
+        copyFinalBtn.addEventListener('click', function() {
+            const finalResultBox = document.querySelector('.final-result-box');
+            if (finalResultBox) {
+                navigator.clipboard.writeText(finalResultBox.textContent).then(function() {
+                    showNotification('Final result copied to clipboard!', 'success');
+                }, function(err) {
+                    showNotification('Could not copy text: ' + err, 'error');
+                });
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
