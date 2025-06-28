@@ -1,0 +1,580 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}CipherPro | Enterprise-Grade Hill Cipher Tool{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/hill.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="hero" id="home">
+    <div class="container">
+        <h1>Hill Cipher Solution</h1>
+        <p>Secure your sensitive communications with military-grade Hill cipher encryption. Our enterprise solution provides advanced encryption and decryption capabilities with comprehensive security controls and audit capabilities.</p>
+    </div>
+</section>
+
+<main class="main container" id="tools">
+    <div class="notification" id="notification"></div>
+    
+    <section class="cipher-section">
+        <h2 class="section-title">Hill Cipher Tool</h2>
+        <div class="input-group">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Enter your message here..."></textarea>
+        </div>
+        <div class="input-group">
+            <label for="key-input-method">Key Input Method</label>
+            <select id="key-input-method">
+                <option value="matrix">Enter Key Matrix</option>
+                <option value="word">Enter Key Word</option>
+            </select>
+        </div>
+        <div class="input-row" id="matrix-row">
+            <div class="input-group">
+                <label for="matrix-dimension">Matrix Dimension</label>
+                <select id="matrix-dimension">
+                    <option value="2">2 x 2</option>
+                    <option value="3" selected>3 x 3</option> <!-- Default to 3x3 for your test case -->
+                </select>
+            </div>
+        </div>
+        <div class="input-group" id="matrix-group">
+            <label>Key Matrix</label>
+            <div id="matrix-input-grid"></div>
+        </div>
+        <div class="input-group" id="word-group" style="display:none;">
+            <label for="key-word">Key Word</label>
+            <input type="text" id="key-word" placeholder="Enter key word (e.g. GYBNQKURP)" />
+        </div>
+        <div class="input-row">
+            <div class="input-group">
+                <label for="operation">Operation</label>
+                <select id="operation">
+                    <option value="encrypt">Encrypt</option>
+                    <option value="decrypt">Decrypt</option>
+                </select>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button id="process-btn" class="btn tooltip">
+                <span class="btn-text">Process</span>
+                <span class="btn-icon"><i class="fas fa-cog"></i></span>
+            </button>
+            <button id="clear-btn" class="btn btn-secondary tooltip">
+                <span class="btn-text">Clear</span>
+                <span class="btn-icon"><i class="fas fa-eraser"></i></span>
+            </button>
+        </div>
+        <div class="result-section" id="result-section">
+            <h3>Result</h3>
+            <div class="result-box" id="result-output"></div>
+            <button id="copy-btn" class="btn btn-accent copy-btn tooltip">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+            </button>
+        </div>
+        <div class="shift-visualization" id="shift-visualization">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <h3 style="color: var(--primary-color); font-size: 1.6rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <i class="fas fa-calculator"></i>
+                    Hill Cipher Matrix Visualization
+                </h3>
+                <div class="visualization-guide">
+                    <i class="fas fa-info-circle"></i>
+                    Watch how your message is transformed through matrix multiplication.
+                </div>
+            </div>
+            <div id="hill-visualization-steps"></div>
+            <div id="visualization-info" class="visualization-info">
+                <i class="fas fa-lightbulb"></i>
+                Enter a message and click "Process" to see the step-by-step visualization.
+            </div>
+        </div>
+    </section>
+    <!-- ========= NEW: Feature Cards for Hill Cipher ========= -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-th"></i></div>
+            <h3 class="feature-title">Polygraphic Substitution</h3>
+            <p>Encrypts blocks of letters (digraphs, trigraphs) simultaneously, effectively obscuring individual letter frequencies[5][9].</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-cogs"></i></div>
+            <h3 class="feature-title">Linear Algebra Core</h3>
+            <p>Based on matrix multiplication and modular arithmetic, making it a classic example of applying linear algebra to cryptography[7][8].</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-key"></i></div>
+            <h3 class="feature-title">Invertible Key Matrix</h3>
+            <p>Uses a square matrix as its key, which must be invertible to allow for the decryption of the ciphertext[5][6].</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-cubes"></i></div>
+            <h3 class="feature-title">Block-Based Operation</h3>
+            <p>As a block cipher, it processes plaintext in fixed-size blocks, a foundational concept in modern symmetric encryption[5][7].</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3 class="feature-title">Resistance to Analysis</h3>
+            <p>Significantly more resistant to frequency analysis attacks compared to simple substitution ciphers that operate on single letters[7].</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-ruler-combined"></i></div>
+            <h3 class="feature-title">Scalable Complexity</h3>
+            <p>The complexity and security of the cipher increase with the dimensions of the key matrix (e.g., 3x3 is stronger than 2x2)[5][7].</p>
+        </div>
+    </div>
+
+    <!-- ========= NEW: About and How-to-Use Sections ========= -->
+    <section class="info-section" id="about">
+        <h2 class="section-title">About the Hill Cipher</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <p>Invented by mathematician Lester S. Hill in 1929, the Hill cipher is a classical polygraphic substitution cipher based on linear algebra[4][8]. It was one of the first ciphers to operate on groups of more than three letters at once, representing a significant advancement in cryptography for its time[4].</p>
+                <p>The cipher transforms blocks of plaintext letters into numeric vectors and uses matrix multiplication with a secret key matrix to produce ciphertext vectors[6][7]. Decryption is achieved by multiplying the ciphertext vectors by the inverse of the key matrix[5]. A critical requirement is that the key matrix must be invertible modulo 26; otherwise, decryption is impossible[5][7]. While vulnerable to known-plaintext attacks due to its linearity, the Hill cipher remains a foundational algorithm for understanding the application of mathematics in cryptography[7].</p>
+            </div>
+            <div class="info-image">
+                <img src="https://i.ytimg.com/vi/rS2aJgGUSvE/maxresdefault.jpg" alt="Hill Cipher Matrix Multiplication Diagram">
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section" id="help">
+        <h2 class="section-title">How to Use</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <ol>
+                    <li><strong>Enter Your Message:</strong> Type or paste the text you want to process. Non-alphabetic characters are automatically removed.</li>
+                    <li><strong>Choose Key Method:</strong> Select "Enter Key Matrix" to input numbers directly, or "Enter Key Word" to automatically generate a matrix from a word[5].</li>
+                    <li><strong>Provide Key:</strong> Enter the key matrix values or a keyword. The resulting matrix must be invertible modulo 26 for decryption to work[5].</li>
+                    <li><strong>Select Operation:</strong> Choose whether to "Encrypt" or "Decrypt" your message.</li>
+                    <li><strong>Process and Visualize:</strong> Click "Process" to see the result and a step-by-step visualization of the matrix calculations.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+    
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- DOM Elements ---
+    const messageInput = document.getElementById('message');
+    const matrixDimensionSelect = document.getElementById('matrix-dimension');
+    const matrixInputGrid = document.getElementById('matrix-input-grid');
+    const operationSelect = document.getElementById('operation');
+    const processBtn = document.getElementById('process-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const resultSection = document.getElementById('result-section');
+    const resultOutput = document.getElementById('result-output');
+    const copyBtn = document.getElementById('copy-btn');
+    const hillVisualizationSteps = document.getElementById('hill-visualization-steps');
+    const visualizationInfo = document.getElementById('visualization-info');
+    const keyInputMethod = document.getElementById('key-input-method');
+    const matrixRow = document.getElementById('matrix-row');
+    const matrixGroup = document.getElementById('matrix-group');
+    const wordGroup = document.getElementById('word-group');
+    const keyWordInput = document.getElementById('key-word');
+
+    // --- Helper Functions ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function showNotification(message, type) {
+        const notification = document.getElementById('notification');
+        if (!notification) return;
+        notification.textContent = message;
+        notification.className = 'notification ' + type;
+        notification.style.display = 'block';
+        setTimeout(() => { notification.style.display = 'none'; }, 4000);
+    }
+    
+    // --- Matrix and Text Handling ---
+    function renderMatrixInput(size) {
+        let html = '<table>';
+        for (let i = 0; i < size; i++) {
+            html += '<tr>';
+            for (let j = 0; j < size; j++) {
+                let defaultValue = '0';
+                if (size === 2) {
+                    if (i === 0 && j === 0) defaultValue = '11';
+                    if (i === 0 && j === 1) defaultValue = '8';
+                    if (i === 1 && j === 0) defaultValue = '19';
+                    if (i === 1 && j === 1) defaultValue = '17';
+                } else if (size === 3) {
+                    if (i === 0 && j === 0) defaultValue = '6';
+                    if (i === 0 && j === 1) defaultValue = '24';
+                    if (i === 0 && j === 2) defaultValue = '1';
+                    if (i === 1 && j === 0) defaultValue = '13';
+                    if (i === 1 && j === 1) defaultValue = '16';
+                    if (i === 1 && j === 2) defaultValue = '10';
+                    if (i === 2 && j === 0) defaultValue = '20';
+                    if (i === 2 && j === 1) defaultValue = '17';
+                    if (i === 2 && j === 2) defaultValue = '15';
+                }
+                html += `<td><input type="text" class="matrix-cell" data-row="${i}" data-col="${j}" value="${defaultValue}" /></td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</table>';
+        matrixInputGrid.innerHTML = html;
+    }
+
+    function getMatrixFromInputs(size) {
+        let matrix = [];
+        for (let i = 0; i < size; i++) {
+            let row = [];
+            for (let j = 0; j < size; j++) {
+                let input = matrixInputGrid.querySelector(`input[data-row="${i}"][data-col="${j}"]`);
+                let val = parseInt(input.value, 10);
+                if (isNaN(val)) return null;
+                row.push(val);
+            }
+            matrix.push(row);
+        }
+        return matrix;
+    }
+    
+    function getKeyMatrixFromWord(word, size) {
+        word = word.toUpperCase().replace(/[^A-Z]/g, '');
+        let needed = size * size;
+        if (word.length < needed) {
+            showNotification(`Key word "${word}" is too short. It needs ${needed} characters for a ${size}x${size} matrix. Padding with 'X'.`, 'error');
+            word += 'X'.repeat(needed - word.length);
+        } else if (word.length > needed) {
+            showNotification(`Key word "${word}" is too long. Truncating to ${needed} characters for a ${size}x${size} matrix.`, 'error');
+            word = word.slice(0, needed);
+        }
+        let keyNumbers = Array.from(word).map(c => c.charCodeAt(0) - 65);
+        let matrix = [];
+        for (let i = 0; i < size; i++) {
+            matrix.push(keyNumbers.slice(i * size, (i + 1) * size));
+        }
+        return matrix;
+    }
+
+    function textToVectors(text, size) {
+        let clean = text.toUpperCase().replace(/[^A-Z]/g, '');
+        const originalCleanLength = clean.length; // Store the length BEFORE padding
+        while (clean.length % size !== 0) clean += 'X'; // Pad with 'X'
+        
+        let vectors = [];
+        for (let i = 0; i < clean.length; i += size) {
+            let vec = [];
+            let blockLetters = [];
+            for (let j = 0; j < size; j++) {
+                vec.push(clean.charCodeAt(i + j) - 65);
+                blockLetters.push(clean[i + j]);
+            }
+            vectors.push({ numerical: vec, letters: blockLetters, originalLength: originalCleanLength });
+        }
+        return vectors;
+    }
+
+    function vectorsToText(numbers) {
+        return numbers.map(n => String.fromCharCode(n + 65)).join('');
+    }
+
+    // --- Client-Side Math for Visualization (Modular Inverse, Determinant, Adjugate) ---
+    const ALPHABET_SIZE = 26;
+
+    function modInverse(a, m) {
+        a = (a % m + m) % m;
+        for (let x = 1; x < m; x++) {
+            if (((a * x) % m) === 1) return x;
+        }
+        return -1; // No inverse
+    }
+
+    function matrixDeterminant(matrix) {
+        const size = matrix.length;
+        if (size === 2) {
+            return (matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]);
+        } else if (size === 3) {
+            const m = matrix;
+            return (
+                m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+                m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+                m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
+            );
+        }
+        return 0; // Unsupported size
+    }
+    
+    // CORRECTED adjugate (adjoint) for 3x3 matrices
+    function adjugate3x3(m) {
+        // C(i,j) = (-1)^(i+j) * det(M_ij)
+        const cofactor = [
+            [ (m[1][1]*m[2][2] - m[1][2]*m[2][1]), -(m[1][0]*m[2][2] - m[1][2]*m[2][0]),  (m[1][0]*m[2][1] - m[1][1]*m[2][0]) ],
+            [-(m[0][1]*m[2][2] - m[0][2]*m[2][1]),  (m[0][0]*m[2][2] - m[0][2]*m[2][0]), -(m[0][0]*m[2][1] - m[0][1]*m[2][0]) ],
+            [ (m[0][1]*m[1][2] - m[0][2]*m[1][1]), -(m[0][0]*m[1][2] - m[0][2]*m[1][0]),  (m[0][0]*m[1][1] - m[0][1]*m[1][0]) ]
+        ];
+        // Adjugate is the transpose of the cofactor matrix
+        return cofactor[0].map((_, i) => cofactor.map(row => row[i]));
+    }
+
+    function matrixModInverse(matrix, modulus) {
+        const size = matrix.length;
+        const det = matrixDeterminant(matrix);
+        const detInv = modInverse(det, modulus);
+
+        if (detInv === -1) return null; // No inverse
+
+        let adjugate;
+        if (size === 2) {
+            adjugate = [
+                [matrix[1][1], -matrix[0][1]],
+                [-matrix[1][0], matrix[0][0]]
+            ];
+        } else if (size === 3) {
+            adjugate = adjugate3x3(matrix);
+        } else {
+            return null; // Unsupported size
+        }
+
+        let inv = [];
+        for (let i = 0; i < size; i++) {
+            inv[i] = [];
+            for (let j = 0; j < size; j++) {
+                inv[i][j] = ((adjugate[i][j] * detInv) % modulus + modulus) % modulus; // Ensure positive modulo
+            }
+        }
+        return inv;
+    }
+
+    // --- Core Processing Logic ---
+    async function processHillCipher() {
+        const message = messageInput.value;
+        let size = parseInt(matrixDimensionSelect.value, 10);
+        let keyMatrix;
+        const operation = operationSelect.value;
+        const modulus = 26;
+
+        if (!message) {
+            showNotification('Please enter a message.', 'error');
+            return;
+        }
+
+        if (keyInputMethod.value === 'matrix') {
+            keyMatrix = getMatrixFromInputs(size);
+            if (!keyMatrix) {
+                showNotification('Please fill all key matrix values with numbers.', 'error');
+                return;
+            }
+        } else {
+            const word = keyWordInput.value;
+            if (!word) {
+                showNotification('Please enter a key word.', 'error');
+                return;
+            }
+            keyMatrix = getKeyMatrixFromWord(word, size);
+        }
+        
+        // Client-side validation for invertibility (important for user feedback)
+        const det = matrixDeterminant(keyMatrix);
+        if (modInverse(det, modulus) === -1) {
+            showNotification('Error: Key matrix is not invertible modulo 26. Determinant has no modular inverse. Try a different key.', 'error');
+            return;
+        }
+
+        processBtn.disabled = true;
+        processBtn.innerHTML = '<span class="btn-text">Processing...</span><i class="fas fa-spinner fa-spin"></i>';
+
+        let allResultVectors = [];
+        let cleanMessageBlocks = textToVectors(message, size); // Renamed to blocks for clarity
+
+        let inverseKeyMatrixForViz = null;
+        if (operation === 'decrypt') {
+            inverseKeyMatrixForViz = matrixModInverse(keyMatrix, modulus);
+        }
+
+        // --- Iterating through blocks and sending to C++ backend ---
+        for (const block of cleanMessageBlocks) {
+            try {
+                const response = await fetch('/api/hill/process/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                    body: JSON.stringify({
+                        operation: operation,
+                        dimension: size,
+                        key_matrix_flat: keyMatrix.flat(),
+                        input_vector_flat: block.numerical,
+                        input_text: block.letters.join(''),
+                        key_word: keyInputMethod.value === 'word' ? keyWordInput.value : null
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'An unknown backend error occurred.');
+                }
+                
+                // Handle response based on whether we got result_vector or result_text
+                if (data.result_vector) {
+                    allResultVectors.push(data.result_vector);
+                } else if (data.result_text) {
+                    // Convert text back to vector for visualization consistency
+                    const textVector = Array.from(data.result_text).map(c => c.charCodeAt(0) - 65);
+                    allResultVectors.push(textVector);
+                } else {
+                    throw new Error('Invalid response format from server');
+                }
+
+            } catch (error) {
+                showNotification(`Processing Error: ${error.message}`, 'error');
+                processBtn.disabled = false;
+                processBtn.innerHTML = '<span class="btn-text">Process</span><i class="fas fa-cog"></i>';
+                return;
+            }
+        }
+
+        // --- Final Result Text Generation and Padding Removal ---
+        let finalResultTextCombined = '';
+        for (const vec of allResultVectors) {
+            finalResultTextCombined += vectorsToText(vec);
+        }
+        
+        // This is the CRITICAL unpadding step: truncate to original clean length
+        const originalCleanLength = cleanMessageBlocks[0].originalLength;
+        const finalResult = finalResultTextCombined.substring(0, originalCleanLength);
+
+        resultOutput.textContent = finalResult;
+        resultSection.style.display = 'block';
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+
+        // --- Visualization ---
+        visualizeHillCipher(message, keyMatrix, operation, allResultVectors, cleanMessageBlocks, inverseKeyMatrixForViz);
+
+        processBtn.disabled = false;
+        processBtn.innerHTML = '<span class="btn-text">Process</span><i class="fas fa-cog"></i>';
+    }
+
+    // --- Visualization Rendering ---
+    function matrixToHtml(matrix, isVector = false, className = '') {
+        let html = `<table class="${className}">`;
+        for (let i = 0; i < matrix.length; i++) {
+            html += '<tr>';
+            const row = isVector ? [matrix[i]] : matrix[i];
+            for (let j = 0; j < row.length; j++) {
+                html += `<td>${row[j]}</td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</table>';
+        return html;
+    }
+
+    function visualizeHillCipher(originalMessage, keyMatrix, operation, processedResultVectors, originalCleanMessageBlocks, inverseKeyMatrixForViz) {
+        const modulus = 26;
+        let vizHtml = '';
+        let processingMatrix = keyMatrix;
+        let stepCounter = 1;
+
+        if (operation === 'decrypt') {
+            const originalDet = matrixDeterminant(keyMatrix);
+            const originalDetInv = modInverse(originalDet, modulus);
+            vizHtml += `<div class="matrix-step"><div class="step-title"><span class="step-number">${stepCounter++}</span>Calculate Inverse Key Matrix (mod ${modulus})</div><div class="matrix-operation">
+                <div class="matrix-container"><div class="matrix-label">Original Key Matrix</div>${matrixToHtml(keyMatrix, false, 'matrix-visual')}</div>
+                <div class="operation-symbol">→</div>
+                <div class="matrix-container"><div class="matrix-label">Determinant: ${originalDet}</div><div class="matrix-label">Modular Inverse of Det: ${originalDetInv !== -1 ? originalDetInv : 'N/A'}</div><div class="matrix-label">Inverse Key Matrix (mod ${modulus})</div>${matrixToHtml(inverseKeyMatrixForViz, false, 'matrix-visual')}</div>
+            </div></div>`;
+            processingMatrix = inverseKeyMatrixForViz;
+        }
+
+        originalCleanMessageBlocks.forEach((block, blockIdx) => {
+            const inputVectorLetters = block.letters.map(l => `<span style='color:#ff3333;font-weight:600;'>${l}</span>`).join('');
+            const outputVectorLetters = processedResultVectors[blockIdx].map(n => `<span style='color:#00ff99;font-weight:600;'>${String.fromCharCode(n + 65)}</span>`).join('');
+            vizHtml += `<div class="matrix-step"><div class="step-title"><span class="step-number">${stepCounter++}</span>Process Block ${blockIdx + 1}: &nbsp; ${block.letters.join('')}</div><div class="matrix-operation">
+                <div class="matrix-container"><div class="matrix-label">${operation === 'encrypt' ? 'Key Matrix' : 'Inverse Key Matrix'}</div>${matrixToHtml(processingMatrix, false, 'matrix-visual')}</div>
+                <div class="operation-symbol">×</div>
+                <div class="matrix-container"><div class="matrix-label">${operation === 'encrypt' ? 'Plaintext' : 'Ciphertext'} Vector</div><div style="display: flex; align-items: center; gap: 1rem; justify-content: center;">${matrixToHtml(block.numerical.map(x=>[x]), true, 'matrix-visual')}<div style="display: flex; flex-direction: column; gap: 0.3rem;">${inputVectorLetters}</div></div></div>
+                <div class="operation-symbol">=</div>
+                <div class="matrix-container"><div class="matrix-label">Result Vector</div><div style="display: flex; align-items: center; gap: 1rem; justify-content: center;">${matrixToHtml(processedResultVectors[blockIdx].map(x=>[x]), true, 'matrix-visual')}<div style="display: flex; flex-direction: column; gap: 0.3rem;">${outputVectorLetters}</div></div></div>
+            </div></div>`;
+        });
+
+        // Final result display for visualization (must use the same truncated string as main output)
+        const finalResultForDisplay = resultOutput.textContent; // Get the already truncated result
+        vizHtml += `<div class="result-highlight"><div style="font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--light-color);"><i class="fas fa-check-circle"></i> Final ${operation === 'decrypt' ? 'Plaintext' : 'Ciphertext'} Result</div><div class="result-text">"${finalResultForDisplay}"</div></div>`;
+        
+        hillVisualizationSteps.innerHTML = vizHtml;
+        visualizationInfo.textContent = `Detailed processing of ${originalCleanMessageBlocks.length} block(s) completed. All calculations are performed modulo 26.`;
+        visualizationInfo.classList.add('active');
+    }
+
+    // --- Event Listeners and Initial Setup ---
+    matrixDimensionSelect.addEventListener('change', function() {
+        renderMatrixInput(parseInt(this.value, 10));
+    });
+
+    keyInputMethod.addEventListener('change', function() {
+        if (this.value === 'matrix') {
+            matrixRow.style.display = 'flex';
+            matrixGroup.style.display = 'block';
+            wordGroup.style.display = 'none';
+        } else {
+            matrixRow.style.display = 'none';
+            matrixGroup.style.display = 'none';
+            wordGroup.style.display = 'block';
+        }
+        clearVisualization();
+    });
+
+    // Initial render based on default selected value (3x3)
+    renderMatrixInput(parseInt(matrixDimensionSelect.value, 10));
+    matrixRow.style.display = 'flex';
+    matrixGroup.style.display = 'block';
+    wordGroup.style.display = 'none';
+    
+    // Set default key word if method is 'word' and dimension is 3x3 initially
+    keyWordInput.value = 'GYBNQKURP'; // Default key word for 3x3
+
+    processBtn.addEventListener('click', processHillCipher);
+    clearBtn.addEventListener('click', clearAll);
+    copyBtn.addEventListener('click', copyToClipboard);
+
+    function clearAll() {
+        messageInput.value = '';
+        renderMatrixInput(parseInt(matrixDimensionSelect.value, 10));
+        operationSelect.value = 'encrypt';
+        keyInputMethod.value = 'matrix';
+        matrixRow.style.display = 'flex';
+        matrixGroup.style.display = 'block';
+        wordGroup.style.display = 'none';
+        keyWordInput.value = 'GYBNQKURP'; // Reset to default key word
+        resultOutput.textContent = '';
+        resultSection.style.display = 'none';
+        clearVisualization();
+    }
+
+    function clearVisualization() {
+        hillVisualizationSteps.innerHTML = '';
+        visualizationInfo.innerHTML = '<i class="fas fa-lightbulb"></i> Enter a message and click "Process" to see the step-by-step visualization.';
+        visualizationInfo.classList.remove('active');
+    }
+
+    function copyToClipboard() {
+        const result = resultOutput.textContent;
+        if (!result) { showNotification('No result to copy.', 'error'); return; }
+        navigator.clipboard.writeText(result)
+            .then(() => showNotification('Result copied to clipboard!', 'success'))
+            .catch(err => showNotification('Failed to copy: ' + err, 'error'));
+    }
+});
+</script>
+{% endblock %}
