@@ -22,7 +22,7 @@ from HillCipher.HillCipher import hill_cipher_fallback
 from DES.DES import des_fallback
 from SHA512.SHA512 import sha512_hash
 from AES.AES import aes_fallback
-from DiffieHellman.diffie_hellman_fallback import diffie_hellman_fallback
+from DiffieHellman.DiffieHellman import diffie_hellman_fallback
 from MD5.MD5 import MD5Hash
 
 def home(request):
