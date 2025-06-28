@@ -1,0 +1,353 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Diffie-Hellman Key Exchange Visualizer{% endblock %}
+
+{% block extra_head %}
+    {# This block allows you to add page-specific CSS links in your base.html #}
+    <link rel="stylesheet" href="{% static 'css/diffie_hellman.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="hero" id="home">
+    <div class="container">
+        <h1>Diffie-Hellman Key Exchange</h1>
+        <p>Securely establish a shared secret between two parties over an insecure channel. This tool visualizes the entire process step-by-step.</p>
+    </div>
+</section>
+
+<main class="main container" id="tools">
+    <div class="notification" id="notification"></div>
+    <section class="cipher-section">
+        <h2 class="section-title">Key Exchange Parameters</h2>
+        
+        <div class="input-row">
+            <div class="input-group">
+                <label for="prime">Public Prime (p)</label>
+                <input type="number" id="prime" value="23">
+            </div>
+            <div class="input-group">
+                <label for="generator">Public Generator (g)</label>
+                <input type="number" id="generator" value="5">
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="alice-private">Alice's Private Key (a)</label>
+                <input type="number" id="alice-private" value="6">
+            </div>
+            <div class="input-group">
+                <label for="bob-private">Bob's Private Key (b)</label>
+                <input type="number" id="bob-private" value="15">
+            </div>
+        </div>
+          
+        <div class="btn-group">
+            <button id="process-btn" class="btn">
+                <i class="fas fa-cogs" style="margin-right: 8px;"></i>
+                Generate & Exchange Keys
+            </button>
+            <button id="randomize-btn" class="btn btn-secondary">
+                <i class="fas fa-random" style="margin-right: 8px;"></i>
+                Randomize Parameters
+            </button>
+        </div>
+        
+        <div class="result-section" id="result-section">
+            <h3>Shared Secret</h3>
+            <div class="result-box" id="result-output"></div>
+        </div>
+
+        <div class="dh-visualization" id="dh-visualization" style="display: none;">
+            <h3>Key Exchange Process Visualization</h3>
+
+            <!-- Step 1: Public Parameters -->
+            <div class="dh-step" id="step-1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h4>Public Parameters Agreement</h4>
+                    <div class="step-status" id="step-1-status"></div>
+                </div>
+                <div class="step-content party-section">
+                    <div class="party-box">
+                        <span class="formula">Prime (p)</span>
+                        <span class="value" id="p-value"></span>
+                    </div>
+                    <div class="party-box">
+                        <span class="formula">Generator (g)</span>
+                        <span class="value" id="g-value"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <!-- Step 2: Private Key Selection -->
+            <div class="dh-step" id="step-2">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h4>Private Key Selection</h4>
+                    <div class="step-status" id="step-2-status"></div>
+                </div>
+                <div class="step-content party-section">
+                    <div class="party-box">
+                        <h5>Alice (Secret)</h5>
+                        <span class="formula">Private key (a)</span>
+                        <span class="value" id="a-value"></span>
+                    </div>
+                    <div class="party-box">
+                        <h5>Bob (Secret)</h5>
+                        <span class="formula">Private key (b)</span>
+                        <span class="value" id="b-value"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <!-- Step 3: Public Key Generation -->
+            <div class="dh-step" id="step-3">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h4>Public Key Generation</h4>
+                    <div class="step-status" id="step-3-status"></div>
+                </div>
+                <div class="step-content party-section">
+                    <div class="party-box">
+                        <h5>Alice (Public)</h5>
+                        <span class="formula">A = g<sup>a</sup> mod p</span>
+                        <span class="value" id="A-value"></span>
+                    </div>
+                    <div class="party-box">
+                        <h5>Bob (Public)</h5>
+                        <span class="formula">B = g<sup>b</sup> mod p</span>
+                        <span class="value" id="B-value"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="process-arrow"><i class="fas fa-exchange-alt"></i></div>
+
+            <!-- Step 4: Shared Secret Calculation -->
+            <div class="dh-step" id="step-4">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <h4>Shared Secret Calculation</h4>
+                    <div class="step-status" id="step-4-status"></div>
+                </div>
+                <div class="step-content party-section">
+                    <div class="party-box">
+                        <h5>Alice Computes Secret</h5>
+                        <span class="formula">S = B<sup>a</sup> mod p</span>
+                        <span class="value" id="S1-value"></span>
+                    </div>
+                    <div class="party-box">
+                        <h5>Bob Computes Secret</h5>
+                        <span class="formula">S = A<sup>b</sup> mod p</span>
+                        <span class="value" id="S2-value"></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-key"></i></div>
+            <h3 class="feature-title">Secure Key Exchange</h3>
+            <p>Establish a shared secret over an insecure network, preventing eavesdroppers from knowing the key.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-user-secret"></i></div>
+            <h3 class="feature-title">No Prior Secrets</h3>
+            <p>Two parties with no prior knowledge of each other can jointly create a secret key for communication.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-forward"></i></div>
+            <h3 class="feature-title">Forward Secrecy</h3>
+            <p>Compromise of a long-term key doesn't compromise past session keys, a crucial security feature.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-infinity"></i></div>
+            <h3 class="feature-title">Mathematical Foundation</h3>
+            <p>Based on the difficulty of computing discrete logarithms, a well-studied problem in mathematics.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-eye"></i></div>
+            <h3 class="feature-title">Visual Learning</h3>
+            <p>Understand the intricate steps of the key exchange with our clear, step-by-step visualization.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3 class="feature-title">Foundation of TLS</h3>
+            <p>Diffie-Hellman is a fundamental component of modern security protocols like TLS, SSH, and IPsec.</p>
+        </div>
+    </div>
+    
+    <section class="info-section" id="about">
+        <h2 class="section-title">About Diffie-Hellman</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <p>The Diffie-Hellman (DH) Key Exchange is a cryptographic protocol that allows two parties to establish a shared secret over a public, insecure channel. Published in 1976 by Whitfield Diffie and Martin Hellman, it was one of the first practical examples of public-key cryptography.</p>
+                <p>The core idea is often explained with a paint mixing analogy: Alice and Bob start with a common paint color (public). They each add their own secret color and mix. They exchange their mixed colors publicly. Finally, they each add their original secret color to the mix they received. The result is an identical final color that only they know, as it's computationally infeasible for an eavesdropper to separate the mixed colors.</p>
+                <p>Mathematically, it uses modular arithmetic and the difficulty of computing discrete logarithms. While the DH method itself is resistant to sniffing attacks, it is vulnerable to Man-in-the-Middle (MitM) attacks if used without authentication (e.g., digital signatures).</p>
+            </div>
+            <div class="info-image">
+                <img src="https://i.imgur.com/u1n2tSc.png" alt="Diffie-Hellman Paint Analogy">
+            </div>
+        </div>
+    </section>
+    
+    <section class="info-section" id="help">
+        <h2 class="section-title">How to Use</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <ol>
+                    <li><strong>Public Parameters:</strong> Alice and Bob agree on a public prime number (p) and a generator (g). You can use the defaults or provide your own.</li>
+                    <li><strong>Private Keys:</strong> Alice and Bob each choose a secret private key (a and b).</li>
+                    <li><strong>Generate & Exchange:</strong> Click the "Generate & Exchange Keys" button. The tool will calculate the public keys and then the final shared secret.</li>
+                    <li><strong>Visualize the Process:</strong> The visualization section will show each step of the calculation, from generating public keys to computing the identical shared secret.</li>
+                    <li><strong>Randomize:</strong> Use the "Randomize Parameters" button to try the exchange with different valid numbers.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const primeInput = document.getElementById('prime');
+    const generatorInput = document.getElementById('generator');
+    const alicePrivateInput = document.getElementById('alice-private');
+    const bobPrivateInput = document.getElementById('bob-private');
+
+    const processBtn = document.getElementById('process-btn');
+    const randomizeBtn = document.getElementById('randomize-btn');
+    
+    const visualizationContainer = document.getElementById('dh-visualization');
+    const resultSection = document.getElementById('result-section');
+    const resultOutput = document.getElementById('result-output');
+    const notification = document.getElementById('notification');
+
+    // This function calculates (base^exp) % mod using BigInt for safety with large numbers
+    function power(base, exp, mod) {
+        let res = 1n;
+        base = BigInt(base) % BigInt(mod);
+        while (exp > 0n) {
+            if (exp % 2n === 1n) res = (res * base) % BigInt(mod);
+            exp = exp >> 1n;
+            base = (base * base) % BigInt(mod);
+        }
+        return res;
+    }
+
+    function showNotification(message, type = 'success') {
+        notification.textContent = message;
+        notification.className = 'notification ' + type;
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+
+    function updateStepStatus(step, status) {
+        const stepEl = document.getElementById(`step-${step}`);
+        const statusEl = document.getElementById(`step-${step}-status`);
+        stepEl.classList.remove('active');
+        
+        if (status === 'processing') {
+            statusEl.textContent = '🔄 Processing';
+            statusEl.className = 'step-status processing';
+            stepEl.classList.add('active');
+        } else if (status === 'complete') {
+            statusEl.textContent = '✅ Complete';
+            statusEl.className = 'step-status complete';
+        } else {
+             statusEl.textContent = '⏳ Waiting';
+             statusEl.className = 'step-status';
+        }
+    }
+    
+    function animateExchange() {
+        if (!primeInput.value || !generatorInput.value || !alicePrivateInput.value || !bobPrivateInput.value) {
+            showNotification('All fields must be filled.', 'error');
+            return;
+        }
+
+        const p = BigInt(primeInput.value);
+        const g = BigInt(generatorInput.value);
+        const a = BigInt(alicePrivateInput.value);
+        const b = BigInt(bobPrivateInput.value);
+
+        visualizationContainer.style.display = 'block';
+        resultSection.style.display = 'none';
+
+        const valuesToClear = ['p-value', 'g-value', 'a-value', 'b-value', 'A-value', 'B-value', 'S1-value', 'S2-value'];
+        valuesToClear.forEach(id => document.getElementById(id).textContent = '');
+        for (let i = 1; i <= 4; i++) updateStepStatus(i, 'waiting');
+
+        let delay = 0;
+
+        setTimeout(() => {
+            updateStepStatus(1, 'processing');
+            document.getElementById('p-value').textContent = p.toString();
+            document.getElementById('g-value').textContent = g.toString();
+            setTimeout(() => updateStepStatus(1, 'complete'), 500);
+        }, delay += 100);
+
+        setTimeout(() => {
+            updateStepStatus(2, 'processing');
+            document.getElementById('a-value').textContent = a.toString();
+            document.getElementById('b-value').textContent = b.toString();
+            setTimeout(() => updateStepStatus(2, 'complete'), 500);
+        }, delay += 1000);
+
+        const A = power(g, a, p);
+        const B = power(g, b, p);
+        setTimeout(() => {
+            updateStepStatus(3, 'processing');
+            document.getElementById('A-value').textContent = `${g} ^ ${a} mod ${p} = ${A}`;
+            document.getElementById('B-value').textContent = `${g} ^ ${b} mod ${p} = ${B}`;
+            setTimeout(() => updateStepStatus(3, 'complete'), 500);
+        }, delay += 1000);
+
+        const S1 = power(B, a, p);
+        const S2 = power(A, b, p);
+        setTimeout(() => {
+            updateStepStatus(4, 'processing');
+            document.getElementById('S1-value').textContent = `${B} ^ ${a} mod ${p} = ${S1}`;
+            document.getElementById('S2-value').textContent = `${A} ^ ${b} mod ${p} = ${S2}`;
+            setTimeout(() => updateStepStatus(4, 'complete'), 500);
+        }, delay += 1000);
+
+        setTimeout(() => {
+            resultOutput.textContent = S1.toString();
+            resultOutput.classList.add('success');
+            resultSection.style.display = 'block';
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+            showNotification('Shared secret successfully established!');
+        }, delay += 1000);
+    }
+
+    const validParams = [
+        { p: 23, g: 5 }, { p: 227, g: 17 }, { p: 347, g: 19 }, { p: 991, g: 22 }
+    ];
+
+    function randomize() {
+        const params = validParams[Math.floor(Math.random() * validParams.length)];
+        primeInput.value = params.p;
+        generatorInput.value = params.g;
+        alicePrivateInput.value = Math.floor(Math.random() * (params.p - 2)) + 2;
+        bobPrivateInput.value = Math.floor(Math.random() * (params.p - 2)) + 2;
+        showNotification('Parameters have been randomized.');
+    }
+
+    processBtn.addEventListener('click', animateExchange);
+    randomizeBtn.addEventListener('click', randomize);
+});
+</script>
+{% endblock %}
