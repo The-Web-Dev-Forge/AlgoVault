@@ -1,0 +1,228 @@
+<!-- templates/base.html -->
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CipherPro{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/caesar.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="dropdown-overlay" id="dropdown-overlay"></div>
+
+    <header>
+        <div class="container">
+            <div class="navbar">
+                <div class="navbar-left">
+                    <div class="logo">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>CipherPro</span>
+                    </div>
+                </div>
+                
+                <div class="navbar-center">
+                    <ul class="nav-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#help">Help</a></li>
+                    </ul>
+                </div>
+                
+                <div class="navbar-right">
+                    <div class="user-account">
+                        <div class="user-profile" id="user-profile">
+                            <div class="user-icon"><i class="fas fa-user"></i></div>
+                            <span class="username">Shravani</span>
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        </div>
+                        
+                        <div class="user-dropdown" id="user-dropdown">
+                            <div class="dropdown-header">
+                                <div class="dropdown-user-info">
+                                    <div class="dropdown-user-avatar"><i class="fas fa-user"></i></div>
+                                    <div class="dropdown-username">Shravani</div>
+                                    <div class="dropdown-email">shravani@cipherpro.com</div>
+                                </div>
+                            </div>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item"><a href="#profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                                <li class="dropdown-item"><a href="#account"><i class="fas fa-cog"></i> Account Settings</a></li>
+                                <li class="dropdown-item"><a href="#billing"><i class="fas fa-credit-card"></i> Billing & Plans</a></li>
+                                <li class="dropdown-item"><a href="#security"><i class="fas fa-shield-alt"></i> Security</a></li>
+                            </ul>
+                            <div class="dropdown-divider"></div>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-item"><a href="#help-support"><i class="fas fa-question-circle"></i> Help & Support</a></li>
+                                <li class="dropdown-item logout-item"><a href="#logout" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <div class="algorithm-nav-container">
+        <nav class="algorithm-nav" aria-label="Algorithm navigation">
+            <i class="fa-solid fa-chevron-left" style="color: #ffffff;"></i>
+            <a href="{% url 'caesar_cipher' %}" class="algorithm-nav-item">Caesar Cipher</a>
+            <a href="{% url 'hill' %}" class="algorithm-nav-item">Hill Cipher</a>
+            <a href="#playfair" class="algorithm-nav-item playfair-disabled">Playfair Cipher</a>
+            <a href="{% url 'vigenere' %}" class="algorithm-nav-item">Vigenère Cipher</a>
+            <a href="{% url 'aes' %}" class="algorithm-nav-item aes-disabled">AES</a>
+            <a href="{% url 'des' %}" class="algorithm-nav-item">DES</a>
+            <a href="#rc5" class="algorithm-nav-item rc5-disabled">RC5</a>
+            <a href="{% url 'md5' %}" class="algorithm-nav-item md5-disabled">MD5</a>
+            <a href="{% url 'sha512' %}" class="algorithm-nav-item">SHA-512</a>
+            <a href="{% url 'diffie_hellman' %}" class="algorithm-nav-item">Diffie-Hellman</a>
+            <a href="#hmac" class="algorithm-nav-item hmac-disabled">HMAC</a>
+            <i class="fa-solid fa-chevron-right" style="color: #ffffff;"></i>
+        </nav>
+    </div>
+
+    <div class="theme-toggle-buttons">
+        <button id="theme-toggle-btn" aria-label="Toggle light and dark mode" title="Toggle light and dark mode" class="btn">
+            <i id="theme-toggle-icon" class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    {% block content %}{% endblock %}
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3 class="footer-title">CipherPro</h3>
+                    <p>Professional cryptographic tools for educational and practical purposes. Learn about encryption while securing your communications.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <div class="footer-links">
+                        <a href="#home">Home</a>
+                        <a href="#tools">Cipher Tool</a>
+                        <a href="#about">About Caesar Cipher</a>
+                        <a href="#help">How to Use</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3 class="footer-title">Resources</h3>
+                    <div class="footer-links">
+                        <a href="#">Cryptography Basics</a>
+                        <a href="#">History of Encryption</a>
+                        <a href="#">Modern Encryption Methods</a>
+                        <a href="#">Security Best Practices</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 CipherPro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // UI Elements
+        const userProfile = document.getElementById('user-profile');
+        const userDropdown = document.getElementById('user-dropdown');
+        const dropdownOverlay = document.getElementById('dropdown-overlay');
+        const logoutBtn = document.getElementById('logout-btn');
+        const themeToggleBtn = document.getElementById('theme-toggle-btn');
+        const themeToggleIcon = document.getElementById('theme-toggle-icon');
+        const notification = document.getElementById('notification');
+
+        // --- Theme Toggle Functionality ---
+        function setTheme(isDark) {
+            if (isDark) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                themeToggleIcon.classList.remove('fa-sun');
+                themeToggleIcon.classList.add('fa-moon');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                themeToggleIcon.classList.remove('fa-moon');
+                themeToggleIcon.classList.add('fa-sun');
+            }
+        }
+
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        if (savedTheme === 'light') setTheme(false);
+        else if (savedTheme === 'dark' || prefersDarkScheme.matches) setTheme(true);
+        else setTheme(true);
+
+        themeToggleBtn.addEventListener('click', function() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            setTheme(!isDark);
+            document.body.classList.add('theme-transition');
+            setTimeout(() => document.body.classList.remove('theme-transition'), 1000);
+            showNotification(!isDark ? 'Dark mode activated' : 'Light mode activated', 'success');
+        });
+
+        // --- User Dropdown Functionality ---
+        function openDropdown() {
+            userDropdown.classList.add('show');
+            userProfile.classList.add('active');
+            dropdownOverlay.classList.add('show');
+        }
+
+        function closeDropdown() {
+            userDropdown.classList.remove('show');
+            userProfile.classList.remove('active');
+            dropdownOverlay.classList.remove('show');
+        }
+
+        userProfile.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.contains('show') ? closeDropdown() : openDropdown();
+        });
+        
+        dropdownOverlay.addEventListener('click', closeDropdown);
+        document.addEventListener('click', (e) => {
+            if (!userProfile.contains(e.target) && !userDropdown.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showNotification('Logging out...', 'success');
+            closeDropdown();
+            setTimeout(() => showNotification('Successfully logged out!', 'success'), 1000);
+        });
+        
+        // --- Notification ---
+        function showNotification(message, type) {
+            if (!notification) return;
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.style.display = 'block';
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateY(0)';
+            }, 10);
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transform = 'translateY(-10px)';
+                setTimeout(() => { notification.style.display = 'none'; }, 300);
+            }, 3000);
+        }
+    });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
