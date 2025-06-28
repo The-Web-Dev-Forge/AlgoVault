@@ -1,0 +1,412 @@
+/* static/css/sha512.css */
+/* This is the complete and final CSS for the SHA-512 page. */
+
+/* --- General Page Layout (Inherited from your base theme) --- */
+/* Note: The following styles are for components specific to this page. */
+/* Global styles for body, .container, buttons, etc., come from your base CSS. */
+
+/* --- Static Block Info Visualization (Shows Padding) --- */
+#sha512-block-info {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: var(--input-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    text-align: left;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+#sha512-block-info strong {
+    color: var(--primary-color);
+}
+.static-blocks-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+.static-block {
+    background: linear-gradient(135deg, var(--primary-color) 60%, var(--accent-color) 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.static-block .block-title {
+    font-size: 1.1em;
+    font-weight: 600;
+}
+.static-block .block-size {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+.static-block .padding-info {
+    font-size: 0.85em;
+    margin-top: 0.7em;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    padding: 0.5rem;
+}
+
+/* --- SHA-512 Animated Process Visualization --- */
+.sha512-visualization {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: var(--input-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.sha512-block-diagram-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+/* Blocks scroll container */
+.sha512-blocks-scroll {
+  overflow-x: auto;
+  padding: 1.5rem 0;
+  margin-bottom: 1.5rem;
+}
+
+.sha512-blocks {
+  display: flex;
+  align-items: center;
+  min-width: min-content;
+}
+
+/* Individual block */
+.sha512-block {
+  min-width: 280px;
+  padding: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+
+.sha512-block.active {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 15px rgba(var(--primary-color-rgb), 0.3);
+  transform: scale(1.02);
+}
+
+.block-number {
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+.block-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Block components */
+.sha512-message,
+.sha512-expansion,
+.sha512-compression,
+.sha512-addition,
+.sha512-result {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  background-color: var(--input-bg);
+}
+
+.sha512-arrow {
+  font-size: 1.2rem;
+  margin: 0.25rem 0;
+  color: var(--primary-color);
+}
+
+.sha512-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+/* Block connector arrows */
+.sha512-block-connector {
+  margin: 0 1rem;
+  display: flex;
+  align-items: center;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.sha512-block-connector.active {
+  opacity: 1;
+}
+
+.sha512-block-connector.active {
+  opacity: 1;
+}
+
+/* Detailed round view */
+.sha512-detail-view {
+  background-color: #232323;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.sha512-detail-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: var(--primary-color);
+}
+
+.round-counter {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Working variables display */
+.variables-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.variable-row {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.5rem;
+  background-color: var(--input-bg);
+}
+
+.variable-label {
+  font-weight: bold;
+  width: 30px;
+  color: var(--primary-color);
+}
+
+.variable-value {
+  font-family: monospace;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+/* Round operations display */
+.round-operations {
+  margin-top: 1rem;
+}
+
+.operation-row {
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--input-bg);
+}
+
+.operation-label {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.operation-value {
+  font-family: monospace;
+  font-size: 0.9rem;
+  word-break: break-all;
+}
+
+/* Controls */
+.sha512-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.sha512-controls button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.sha512-controls button:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+}
+
+.sha512-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.sha512-block-connector.active {
+  opacity: 1;
+}
+
+#result-section .result-box {
+    font-size: 0.9rem;      /* Slightly smaller font for the long hash string */
+    letter-spacing: 1px;   /* Add some space between characters */
+    line-height: 1.8;      /* Increase line height if the hash wraps */
+}
+
+/* Ensure the image in the 'About' section has a neutral background in case of transparency */
+#about .info-image img {
+    background-color: #ffffff; /* A white background for the diagram */
+    padding: 10px;             /* Add some padding around the image */
+    border: 1px solid var(--border-color); /* Use the theme's border color */
+}
+
+/* Style the icon for the hash generation button */
+#process-btn .btn-icon .fa-cog {
+    transition: transform 0.8s ease-in-out;
+}
+
+#process-btn:hover .btn-icon .fa-cog {
+    transform: rotate(360deg);
+}
+
+/* --- Animated Flow Visualization --- */
+.sha512-visualization {
+  margin-top: 40px;
+  text-align: center;
+  background: linear-gradient(90deg, #181818 60%, #1a1a1a 100%);
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(255,0,0,0.08);
+  padding: 32px 0 24px 0;
+  
+}
+
+.sha512-block-diagram-title {
+  text-shadow: 0 2px 8px rgba(255,0,0,0.10);
+  letter-spacing: 1.5px;
+  font-weight: 700;
+  font-size: 1.3em;
+  margin-bottom: 18px;
+  color: var(--primary-color);
+}
+
+.sha512-blocks-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 12px;
+  scroll-behavior: smooth;
+  scrollbar-color: var(--primary-color) #222;
+  scrollbar-width: thin;
+}
+
+.sha512-blocks {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 48px;
+  margin-bottom: 20px;
+  position: relative;
+  min-width: max-content;
+  padding: 24px;
+  
+}
+
+/* --- SVG Arrows Between Blocks --- */
+.sha512-svg-arrow {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    z-index: 1; /* Render behind the blocks */
+    pointer-events: none;
+    overflow: visible;
+}
+
+/* --- Individual Animated Blocks --- */
+.sha512-block {
+  position: relative;
+  width: 140px;
+  min-height: 260px;
+  background: linear-gradient(135deg, #232323 70%, #181818 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(255, 0, 0, 0.13);
+  padding: 18px 10px 10px 10px;
+  transition: all 0.3s ease;
+  border: 2.5px solid var(--primary-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sha512-block.active {
+  box-shadow: 0 8px 32px rgba(255, 51, 51, 0.25);
+  border-color: var(--accent-color);
+  transform: translateY(-5px) scale(1.05);
+  z-index: 2;
+}
+
+.sha512-label { font-weight: bold; margin-bottom: 10px; color: var(--primary-color); font-size: 1.1em; }
+.sha512-arrow { width: 40px; height: 40px; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 2em; color: var(--accent-color); opacity: 0; }
+.sha512-block.active .sha512-arrow { opacity: 1; animation: arrow-move 0.7s linear; }
+
+@keyframes arrow-move {
+  from { transform: translateY(-15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.sha512-f, .sha512-plus { width: 54px; height: 54px; margin: 12px auto; display: flex; align-items: center; justify-content: center; font-size: 2em; border-radius: 10px; font-family: 'Montserrat', monospace; box-shadow: 0 2px 8px rgba(255,0,0,0.10); color: white; font-weight: bold; }
+.sha512-f { background: linear-gradient(135deg, var(--primary-color) 60%, var(--accent-color) 100%); border: 2px solid var(--accent-color); }
+.sha512-plus { background: linear-gradient(135deg, #ffb366 60%, #b97a56 100%); border: 2px solid #ffb366; }
+.sha512-hash { background: var(--result-bg); border: 1.5px solid var(--primary-color); border-radius: 10px; margin-top: 12px; padding: 8px 0; font-size: 1em; color: var(--result-text); font-family: 'Consolas', monospace; width: 100%; text-align: center; }
+
+/* --- Animation Controls --- */
+.sha512-controls { margin-top: 10px; }
+.sha512-controls button { margin: 0 8px; padding: 8px 24px; border-radius: 8px; border: none; background: var(--primary-color); color: #fff; font-weight: bold; cursor: pointer; transition: background-color 0.2s, transform 0.2s; }
+.sha512-controls button:hover:not(:disabled) { transform: translateY(-2px); background-color: #cc0000; }
+.sha512-controls button:disabled { background: var(--neutral-color); cursor: not-allowed; opacity: 0.6; }
+
+/* Controls */
+.sha512-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.sha512-controls button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s, transform 0.2s;
+  margin: 0 4px;
+}
+
+.sha512-controls button:hover:not(:disabled) {
+  background-color: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.sha512-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
