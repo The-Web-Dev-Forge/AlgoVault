@@ -1,0 +1,603 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}CipherPro | Enterprise-Grade Vigenère Cipher Tool{% endblock %}
+
+{% block extra_head %}
+<style>
+    /*
+      Vigenere Page-Specific Styles
+      NOTE: Global styles for header, footer, body, fonts, etc., are inherited from base.html's stylesheet.
+    */
+    #result-section .result-box {
+    font-size: 0.9rem;      /* Slightly smaller font for the long hash string */
+    letter-spacing: 1px;   /* Add some space between characters */
+    line-height: 1.8;      /* Increase line height if the hash wraps */
+}
+
+/* Ensure the image in the 'About' section has a neutral background in case of transparency */
+#about .info-image img {
+    background-color: #ffffff; /* A white background for the diagram */
+    padding: 10px;             /* Add some padding around the image */
+    border: 1px solid var(--border-color); /* Use the theme's border color */
+}
+
+/* Style the icon for the hash generation button */
+#process-btn .btn-icon .fa-cog {
+    transition: transform 0.8s ease-in-out;
+}
+
+#process-btn:hover .btn-icon .fa-cog {
+    transform: rotate(360deg);
+}
+
+    :root {
+        --primary-color: #ff0000;
+        --accent-color: #ff3333;
+        --success-color: #ff3333;
+    }
+
+    [data-theme="dark"] {
+        --secondary-color: #0f0f0f;
+        --light-color: #f9fafb;
+        --border-color: #2a2a2a;
+        --card-bg: #121212;
+        --input-bg: #1e1e1e;
+        --text-muted: #9ca3af;
+        --feature-card-bg: #0a0a0a;
+        --result-bg: #121212;
+        --result-text: #e2e8f0;
+        --visualizer-border: #333;
+        --visualizer-text: #e2e8f0;
+        --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+        --glow-effect: 0 0 15px #ff0000;
+    }
+
+    [data-theme="light"] {
+        --secondary-color: #f0f0f0;
+        --light-color: #333333;
+        --border-color: #d1d5db;
+        --card-bg: #ffffff;
+        --input-bg: #f5f5f5;
+        --text-muted: #64748b;
+        --feature-card-bg: #f9fafb;
+        --result-bg: #f5f5f5;
+        --result-text: #333333;
+        --visualizer-border: #d1d5db;
+        --visualizer-text: #333333;
+        --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --glow-effect: 0 0 15px rgba(255, 0, 0, 0.3);
+    }
+
+    .hero {
+        background: linear-gradient(135deg, #cc0000 0%, #cc0000 100%);
+        color: white;
+        padding: 4rem 0;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgcGF0dGVyblRyYW5zZm9ybT0icm90YXRlKDQ1KSI+PHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9Im5vbmUiLz48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDMpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3BhdHRlcm4pIi8+PC9zdmc+');
+        opacity: 0.5;
+    }
+
+    .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; position: relative; z-index: 1; }
+    .hero p { font-size: 1.2rem; max-width: 800px; margin: 0 auto 2rem auto; opacity: 0.9; position: relative; z-index: 1; }
+
+    .main { padding: 3rem 0; }
+
+    .cipher-section {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--border-color);
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 1.8rem;
+        color: var(--light-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+        display: inline-block;
+        font-weight: 600;
+    }
+
+    .input-group { margin-bottom: 1.5rem; }
+    label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+
+    textarea, input[type="text"], input[type="number"], select {
+        width: 100%;
+        padding: 14px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 1rem;
+        background-color: var(--input-bg);
+        color: var(--light-color);
+        transition: border 0.3s, box-shadow 0.3s, background-color 0.3s;
+    }
+
+    textarea:focus, input[type="text"]:focus, input[type="number"]:focus, select:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: var(--glow-effect);
+    }
+
+    textarea { min-height: 150px; resize: vertical; font-family: 'Consolas', 'Monaco', monospace; }
+
+    .input-row { display: flex; gap: 20px; margin-bottom: 1.5rem; }
+    .input-row .input-group { flex: 1; margin-bottom: 0; }
+
+    .btn-group { display: flex; gap: 15px; }
+
+    .result-section {
+        margin-top: 2rem;
+        display: none;
+        background-color: var(--card-bg);
+        border-radius: 8px;
+        padding: 1.5rem;
+        border: 1px solid var(--border-color);
+    }
+    .result-box {
+        background-color: var(--result-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 20px;
+        min-height: 120px;
+        margin-bottom: 1.5rem;
+        white-space: pre-wrap;
+        word-break: break-all;
+        color: var(--result-text);
+        font-family: 'Consolas', 'Monaco', monospace;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+        max-height: 300px;
+    }
+    .copy-btn { display: inline-flex; align-items: center; gap: 8px; }
+
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 3rem; }
+    .feature-card { background-color: var(--feature-card-bg); border-radius: 10px; box-shadow: var(--card-shadow); padding: 2rem; text-align: center; border: 1px solid var(--border-color); transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s; }
+    .feature-card:hover { transform: translateY(-5px); box-shadow: var(--glow-effect); background-color: var(--secondary-color); }
+    .feature-icon { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 1rem; }
+    .feature-title { font-size: 1.4rem; margin-bottom: 1rem; color: var(--light-color); }
+
+    .shift-visualization { overflow-x: auto; margin: 2rem 0; padding: 1.5rem; background-color: rgba(0, 0, 0, 0.05); border-radius: 10px; border: 1px solid var(--border-color); }
+    .visualization-guide { text-align: center; margin-bottom: 1rem; font-size: 0.9rem; color: var(--text-muted); font-style: italic; }
+    .visualization-info { text-align: center; margin-top: 1.5rem; padding: 0.8rem; font-size: 0.9rem; color: var(--light-color); background-color: rgba(255, 0, 0, 0.1); border-radius: 6px; border: 1px dashed rgba(255, 0, 0, 0.3); transition: all 0.3s ease; }
+    .visualization-info.active { background-color: rgba(255, 0, 0, 0.2); border-color: rgba(255, 0, 0, 0.5); font-weight: 500; }
+    .alphabet-map { display: flex; min-width: max-content; margin-bottom: 1.5rem; position: relative; }
+    .alphabet-letter { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--visualizer-border); font-weight: bold; color: var(--visualizer-text); background-color: var(--card-bg); margin: 0 2px; border-radius: 4px; transition: transform 0.5s, background-color 0.5s, color 0.5s; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); position: relative; }
+    .alphabet-letter.highlight { background-color: var(--primary-color); color: white; transform: translateY(-5px); box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3); z-index: 2; }
+    .alphabet-letter.input-highlight { background-color: #ff0000; color: white; transform: translateY(-5px) scale(1.1); box-shadow: 0 5px 20px rgba(255, 0, 0, 0.5); z-index: 3; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 5px 15px rgba(255, 0, 0, 0.5); transform: translateY(-5px) scale(1.1); } 50% { box-shadow: 0 5px 25px rgba(255, 0, 0, 0.8); transform: translateY(-7px) scale(1.15); } 100% { box-shadow: 0 5px 15px rgba(255, 0, 0, 0.5); transform: translateY(-5px) scale(1.1); } }
+    .fade-lights { filter: brightness(0.7); transition: filter 1.2s ease-in-out; }
+    .fade-lights .alphabet-letter { filter: brightness(0.8); }
+    .fade-lights .alphabet-letter.input-highlight { filter: brightness(1.2); }
+    .arrow { color: var(--primary-color); font-size: 1.5rem; margin: 0.5rem 0; text-align: center; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+    .arrow i { animation: arrowPulse 1.5s infinite; }
+    @keyframes arrowPulse { 0% { transform: translateY(0); } 50% { transform: translateY(5px); } 100% { transform: translateY(0); } }
+
+    .info-section { background-color: var(--card-bg); border-radius: 10px; box-shadow: var(--card-shadow); padding: 2rem; margin-top: 3rem; border: 1px solid var(--border-color); }
+    .info-content { display: flex; flex-wrap: wrap; gap: 2rem; }
+    .info-text { flex: 2; min-width: 300px; }
+    .info-image { flex: 1; min-width: 300px; display: flex; align-items: center; justify-content: center; }
+    .info-image img { max-width: 100%; border-radius: 8px; }
+
+    .tooltip .tooltiptext { visibility: hidden; width: 180px; background-color: rgba(20, 20, 20, 0.9); color: #fff; text-align: center; border-radius: 4px; padding: 8px 10px; position: absolute; z-index: 100; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0; transition: opacity 0.2s, transform 0.2s; transform: translateY(10px); font-size: 0.75rem; font-weight: 400; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 0, 0, 0.15); }
+    .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: rgba(20, 20, 20, 0.9) transparent transparent transparent; }
+    .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; transform: translateY(0); }
+
+    .btn-text { margin-right: 10px; }
+
+    @media (max-width: 768px) {
+        .input-row { flex-direction: column; gap: 1rem; }
+        .hero h1 { font-size: 2rem; }
+        .hero p { font-size: 1rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero" id="home">
+    <div class="container">
+        <h1>Vigenère Cipher Solution</h1>
+        <p>Secure your sensitive communications with military-grade Vigenère cipher encryption. Our enterprise solution provides advanced encryption and decryption capabilities with comprehensive security controls and audit capabilities.</p>
+    </div>
+</section>
+
+<main class="main container" id="tools">
+    <div class="notification success" id="notification"></div>
+    
+    <section class="cipher-section">
+        <h2 class="section-title">Vigenère Cipher Tool</h2>
+        
+        <div class="input-group">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Enter your message here..."></textarea>
+        </div>
+        
+        <div class="input-row">
+            <div class="input-group">
+                <label for="keyword">Keyword (letters only)</label>
+                <input type="text" id="keyword" placeholder="Enter a keyword (e.g., KEY)" value="KEY">
+            </div>
+            
+            <div class="input-group">
+                <label for="operation">Operation</label>
+                <select id="operation">
+                    <option value="encrypt">Encrypt</option>
+                    <option value="decrypt">Decrypt</option>
+                    <option value="brute-force">Brute Force Analysis</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="input-group" id="advanced-options" style="display: none;">
+            <label for="analysis-method">Analysis Method</label>
+            <select id="analysis-method">
+                <option value="frequency">Letter Frequency Analysis</option>
+                <option value="all-shifts">All Possible Shifts</option>
+            </select>
+        </div>
+        
+        <div class="btn-group">
+            <button id="process-btn" class="btn tooltip">
+                <span class="btn-text">Process</span>
+                <span class="btn-icon"><i class="fas fa-cog"></i></span>
+                <span class="tooltiptext">Run the cipher operation</span>
+            </button>
+            <button id="clear-btn" class="btn btn-secondary tooltip">
+                <span class="btn-text">Clear</span>
+                <span class="btn-icon"><i class="fas fa-eraser"></i></span>
+                <span class="tooltiptext">Reset all fields</span>
+            </button>
+        </div>
+        
+        <div class="result-section" id="result-section">
+            <h3>Result</h3>
+            <div class="result-box" id="result-output"></div>
+            <button id="copy-btn" class="btn btn-accent copy-btn tooltip">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+                <span class="tooltiptext">Copy result to clipboard</span>
+            </button>
+        </div>
+        
+        <div class="shift-visualization" id="shift-visualization">
+            <h3>Keyword Visualization</h3>
+            <p class="visualization-guide">Type your message to see real-time character highlighting, or click "Process" for animated visualization.</p>
+            <div id="alphabet-original" class="alphabet-map"></div>
+            <div class="arrow"><i class="fas fa-arrow-down"></i></div>
+            <div id="alphabet-shifted" class="alphabet-map"></div>
+            <div id="visualization-info" class="visualization-info">Enter text and process to see character mapping</div>
+        </div>
+    </section>
+    
+    <!-- ========= NEW: Feature Cards for Vigenère Cipher ========= -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+            <h3 class="feature-title">Polyalphabetic Substitution</h3>
+            <p>Uses multiple Caesar ciphers in sequence, determined by a keyword, to add layers of complexity.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-key"></i></div>
+            <h3 class="feature-title">Keyword-Driven Security</h3>
+            <p>The secret keyword is repeated to create a key stream, with each letter determining the shift for the corresponding plaintext letter.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3 class="feature-title">Defeats Frequency Analysis</h3>
+            <p>By using multiple alphabets, it flattens letter frequency distribution, making it immune to simple frequency analysis attacks.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-table"></i></div>
+            <h3 class="feature-title">Vigenère Square</h3>
+            <p>The cipher is based on the Vigenère square (or tableau), a 26x26 grid of all possible Caesar cipher shifts.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-landmark"></i></div>
+            <h3 class="feature-title">Historically Significant</h3>
+            <p>Famously known as "le chiffre indéchiffrable" (the indecipherable cipher) for centuries due to its advanced design.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-search"></i></div>
+            <h3 class="feature-title">Classic Cryptanalysis Target</h3>
+            <p>While strong, it's vulnerable to advanced techniques like the Kasiski examination, which can determine the keyword length.</p>
+        </div>
+    </div>
+    
+    <!-- ========= NEW: About and How-to-Use Sections ========= -->
+    <section class="info-section" id="about">
+        <h2 class="section-title">About the Vigenère Cipher</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <p>The Vigenère cipher is a classic polyalphabetic substitution cipher that enhances the security of the simpler Caesar cipher. It encrypts alphabetic text by using a keyword to select a different Caesar cipher for each letter of the plaintext[3]. While often attributed to Blaise de Vigenère, it was first described by Giovan Battista Bellaso in 1553[3].</p>
+                <p>For centuries, it was considered "le chiffre indéchiffrable" (the indecipherable cipher) because it effectively conceals letter frequencies, a primary weakness of monoalphabetic ciphers[3]. However, the cipher can be broken by first determining the length of the keyword, typically through methods like the Kasiski examination or the Friedman test. Once the key length is known, the ciphertext can be treated as several interwoven Caesar ciphers, which are easily solved[5].</p>
+            </div>
+            <div class="info-image">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Vigen%C3%A8re_square_shading.svg/1024px-Vigen%C3%A8re_square_shading.svg.png" alt="Vigenère Cipher Table">
+            </div>
+        </div>
+    </section>
+
+    <section class="info-section" id="help">
+        <h2 class="section-title">How to Use</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <ol>
+                    <li><strong>Enter Your Message:</strong> Type or paste the text you wish to process in the main text area.</li>
+                    <li><strong>Provide a Keyword:</strong> Enter a secret keyword using only alphabetic characters (A-Z). This word is the key to the cipher[3].</li>
+                    <li><strong>Select Operation:</strong> Choose whether to "Encrypt" your message or "Decrypt" an existing ciphertext.</li>
+                    <li><strong>Process:</strong> Click the "Process" button to perform the Vigenère cipher operation.</li>
+                    <li><strong>View and Copy Result:</strong> The resulting text will appear in the output box. Use the copy button for convenience.</li>
+                </ol>
+                <p><strong>Note:</strong> This implementation ignores all numbers, spaces, and symbols, processing only the alphabetic characters of your message.</p>
+            </div>
+        </div>
+    </section>
+    </section>
+
+    <section class="info-section" id="help">
+        <h2 class="section-title">How to Use</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <ol>
+                    <li><strong>Enter Your Message:</strong> Type or paste the text you want to encrypt or decrypt.</li>
+                    <li><strong>Set Keyword:</strong> Enter a keyword using only alphabetic characters. The keyword is repeated to match the length of the message[3].</li>
+                    <li><strong>Select Operation:</strong> Choose to encrypt or decrypt.</li>
+                    <li><strong>Process:</strong> Click the "Process" button. The result appears in the box below.</li>
+                </ol>
+                <p><strong>Note:</strong> The cipher only processes letters (A-Z, a-z). Numbers and symbols are ignored.</p>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Elements ---
+    const messageInput = document.getElementById('message');
+    const keywordInput = document.getElementById('keyword');
+    const operationSelect = document.getElementById('operation');
+    const processBtn = document.getElementById('process-btn');
+    const resultOutput = document.getElementById('result-output');
+    const resultSection = document.getElementById('result-section');
+    // ... (add other element selectors if needed)
+
+    // Helper function to get the CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    // --- Visualization Logic ---
+    // Use already declared keywordInput and operationSelect
+    const alphabetOriginal = document.getElementById('alphabet-original');
+    const alphabetShifted = document.getElementById('alphabet-shifted');
+
+    function initializeAlphabetVisualization() {
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        alphabetOriginal.innerHTML = '';
+        for (let char of alphabet) {
+            const letterDiv = document.createElement('div');
+            letterDiv.className = 'alphabet-letter';
+            letterDiv.textContent = char;
+            letterDiv.dataset.letter = char;
+            alphabetOriginal.appendChild(letterDiv);
+        }
+        updateKeywordVisualization();
+    }
+
+    function updateKeywordVisualization() {
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const keyword = keywordInput.value.toUpperCase() || 'KEY';
+        const operation = operationSelect.value;
+        alphabetShifted.innerHTML = '';
+        const keywordLength = keyword.length;
+        for (let i = 0; i < keywordLength; i++) {
+            const keyChar = keyword[i];
+            const shift = keyChar.charCodeAt(0) - 65;
+            const rowContainer = document.createElement('div');
+            rowContainer.className = 'alphabet-map';
+            rowContainer.style.marginBottom = '10px';
+            const keyLabel = document.createElement('div');
+            keyLabel.className = 'alphabet-letter input-highlight';
+            keyLabel.textContent = keyChar;
+            keyLabel.style.marginRight = '10px';
+            rowContainer.appendChild(keyLabel);
+            let shiftedAlphabet = '';
+            if (operation === 'encrypt') {
+                for (let j = 0; j < alphabet.length; j++) {
+                    const charCode = alphabet.charCodeAt(j);
+                    const shiftedCharCode = ((charCode - 65 + shift) % 26) + 65;
+                    shiftedAlphabet += String.fromCharCode(shiftedCharCode);
+                }
+            } else {
+                for (let j = 0; j < alphabet.length; j++) {
+                    const charCode = alphabet.charCodeAt(j);
+                    const shiftedCharCode = ((charCode - 65 - shift + 26) % 26) + 65;
+                    shiftedAlphabet += String.fromCharCode(shiftedCharCode);
+                }
+            }
+            for (let j = 0; j < shiftedAlphabet.length; j++) {
+                const char = shiftedAlphabet[j];
+                const letterDiv = document.createElement('div');
+                letterDiv.className = 'alphabet-letter';
+                letterDiv.textContent = char;
+                letterDiv.dataset.letter = char;
+                letterDiv.dataset.keyIndex = i;
+                letterDiv.style.transitionDelay = `${j * 0.01}s`;
+                rowContainer.appendChild(letterDiv);
+            }
+            alphabetShifted.appendChild(rowContainer);
+        }
+    }
+
+    // Update visualization on keyword or operation change
+    keywordInput.addEventListener('input', updateKeywordVisualization);
+    operationSelect.addEventListener('change', updateKeywordVisualization);
+    // Initialize on page load
+    initializeAlphabetVisualization();
+
+    // --- Main Processing Function ---
+    async function processVigenere() {
+        const message = messageInput.value;
+        const keyword = keywordInput.value;
+        const operation = operationSelect.value;
+
+        if (!message || !keyword) {
+            showNotification('Please enter a message and keyword.', 'error');
+            return;
+        }
+
+        // Display a loading state on the button
+        processBtn.disabled = true;
+        processBtn.innerHTML = '<span class="btn-text">Processing...</span><i class="fas fa-spinner fa-spin"></i>';
+
+        try {
+            // Send data to the Django API endpoint
+            const response = await fetch('/api/vigenere/process/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Note: If you use @csrf_exempt, you might not need this token.
+                    // But it's good practice to include it for future security.
+                    'X-CSRFToken': csrftoken 
+                },
+                body: JSON.stringify({
+                    message: message,
+                    keyword: keyword,
+                    operation: operation
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Handle errors returned from the backend
+                throw new Error(data.error || 'An unknown error occurred.');
+            }
+
+            // Display the result from the backend
+            resultOutput.textContent = data.result;
+            resultSection.style.display = 'block';
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+
+            // Highlight after result
+            highlightInputCharacters(message, data.result, operation, true);
+
+        } catch (error) {
+            showNotification(`Error: ${error.message}`, 'error');
+            resultOutput.textContent = '';
+            resultSection.style.display = 'none';
+        } finally {
+            // Restore the button to its original state
+            processBtn.disabled = false;
+            processBtn.innerHTML = '<span class="btn-text">Process</span><span class="btn-icon"><i class="fas fa-cog"></i></span>';
+        }
+    }
+
+    function highlightInputCharacters(input, output, operation, withAnimation = true) {
+        // Clear all previous highlights first
+        document.querySelectorAll('.alphabet-letter').forEach(el => {
+            el.classList.remove('highlight');
+            el.classList.remove('input-highlight');
+        });
+        // Only process alphabetic characters
+        const inputChars = input.split('');
+        const outputChars = output ? output.split('') : [];
+        // For full animation of the cipher process
+        if (withAnimation && output) {
+            let alphabeticIndex = 0;
+            function animateCharacter(index) {
+                if (index >= inputChars.length) return;
+                const inputChar = inputChars[index];
+                const outputChar = outputChars[index] || '';
+                if (inputChar.match(/[a-zA-Z]/)) {
+                    const keyIndex = alphabeticIndex % (keywordInput.value.length || 1);
+                    // Find the appropriate shift row
+                    const shiftRows = alphabetShifted.querySelectorAll('.alphabet-map');
+                    if (shiftRows[keyIndex]) {
+                        const rowLetters = shiftRows[keyIndex].querySelectorAll('.alphabet-letter:not(.input-highlight)');
+                        const inputUpperChar = inputChar.toUpperCase();
+                        const inputCharIndex = inputUpperChar.charCodeAt(0) - 65;
+                        if (inputCharIndex >= 0 && inputCharIndex < 26) {
+                            rowLetters[inputCharIndex].classList.add('input-highlight');
+                        }
+                        const outputUpperChar = outputChar.toUpperCase();
+                        const outputCharIndex = outputUpperChar.charCodeAt(0) - 65;
+                        if (outputCharIndex >= 0 && outputCharIndex < 26) {
+                            for (let i = 0; i < rowLetters.length; i++) {
+                                if (rowLetters[i].textContent === outputUpperChar) {
+                                    rowLetters[i].classList.add('input-highlight');
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    alphabeticIndex++;
+                }
+                setTimeout(() => {
+                    document.querySelectorAll('.alphabet-letter:not(.input-highlight)').forEach(el => {
+                        el.classList.remove('input-highlight');
+                    });
+                    animateCharacter(index + 1);
+                }, 200);
+            }
+            animateCharacter(0);
+        }
+    }
+
+    // --- Event Listeners ---
+    processBtn.addEventListener('click', processVigenere);
+
+    // ... (Keep your other event listeners for clearBtn, copyBtn, etc.)
+    // For example:
+    document.getElementById('clear-btn').addEventListener('click', () => {
+        messageInput.value = '';
+        keywordInput.value = 'KEY';
+        resultOutput.textContent = '';
+        resultSection.style.display = 'none';
+    });
+    
+    document.getElementById('copy-btn').addEventListener('click', () => {
+        if (!resultOutput.textContent) return;
+        navigator.clipboard.writeText(resultOutput.textContent)
+            .then(() => showNotification('Result copied to clipboard!', 'success'))
+            .catch(() => showNotification('Failed to copy text.', 'error'));
+    });
+    
+    // You need a showNotification function, likely in your base.html
+    function showNotification(message, type) {
+        const notification = document.getElementById('notification');
+        if (!notification) return;
+        notification.textContent = message;
+        notification.className = 'notification ' + type;
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+});
+</script>
+{% endblock %}
