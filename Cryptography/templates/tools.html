@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cryptography Tools - AlgoVault{% endblock %}
+
+{% block extra_head %}
+<style>
+    .tools-container {
+        padding: 2rem 0;
+    }
+    
+    .tools-hero {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .tools-hero h1 {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .tools-hero p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .algorithm-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+    
+    .algorithm-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .algorithm-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: var(--primary-color);
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .algorithm-icon {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+    
+    .algorithm-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+    }
+    
+    .algorithm-description {
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .algorithm-type {
+        display: inline-block;
+        background: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .algorithm-grid {
+            grid-template-columns: 1fr;
+            padding: 0 1rem;
+        }
+        
+        .tools-hero h1 {
+            font-size: 2rem;
+        }
+        
+        .algorithm-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="tools-container">
+    <div class="container">
+        <div class="tools-hero">
+            <h1>Cryptography Tools</h1>
+            <p>Explore our comprehensive collection of encryption, hashing, and cryptographic algorithms. Choose a tool to get started with secure data processing.</p>
+        </div>
+        
+        <div class="algorithm-grid">
+            <!-- Caesar Cipher -->
+            <a href="{% url 'caesar_cipher' %}" class="algorithm-card">
+                <div class="algorithm-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h3 class="algorithm-title">Caesar Cipher</h3>
+                <p class="algorithm-description">Classic substitution cipher shifting letters by a fixed number.</p>
+                <span class="algorithm-type">Cipher</span>
+            </a>
+            
+            <!-- Vigenère Cipher -->
+            <a href="{% url 'vigenere' %}" class="algorithm-card">
+                <div class="algorithm-icon">
+                    <i class="fas fa-spell-check"></i>
+                </div>
+                <h3 class="algorithm-title">Vigenère Cipher</h3>
+                <p class="algorithm-description">Polyalphabetic cipher using a keyword for enhanced security.</p>
+                <span class="algorithm-type">Cipher</span>
+            </a>
+            
+            <!-- Hill Cipher -->
+            <a href="{% url 'hill' %}" class="algorithm-card">
+                <div class="algorithm-icon">
+                    <i class="fas fa-th"></i>
+                </div>
+                <h3 class="algorithm-title">Hill Cipher</h3>
+                <p class="algorithm-description">Matrix-based polygraphic substitution cipher system.</p>
+                <span class="algorithm-type">Cipher</span>
+            </a>
+            
+            <!-- AES Encryption -->
+            <a href="{% url 'aes' %}" class="algorithm-card">
+                <div class="algorithm-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="algorithm-title">AES Encryption</h3>
+                <p class="algorithm-description">Advanced Encryption Standard - industry-grade symmetric encryption.</p>
+                <span class="algorithm-type">Encryption</span>
+            </a>
+            
+            <!-- DES Encryption -->
+            <a href="{% url 'des' %}" class="algorithm-card">
+                <div class="algorithm-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="algorithm-title">DES Encryption</h3>
+                <p class="algorithm-description">Data Encryption Standard - classic symmetric block cipher.</p>
+                <span class="algorithm-type">Encryption</span>
+            </a>
+            
+            <!-- MD5 Hash -->
+            <a href="{% url 'md5' %}" class="algorithm-card">
+                <div class="algorithm-icon">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <h3 class="algorithm-title">MD5 Hash</h3>
+                <p class="algorithm-description">Message Digest algorithm producing 128-bit hash values.</p>
+                <span class="algorithm-type">Hash</span>
+            </a>
+            
+            <!-- SHA-512 Hash -->
+            <a href="{% url 'sha512' %}" class="algorithm-card">
+                <div class="algorithm-icon">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <h3 class="algorithm-title">SHA-512 Hash</h3>
+                <p class="algorithm-description">Secure Hash Algorithm producing 512-bit cryptographic hashes.</p>
+                <span class="algorithm-type">Hash</span>
+            </a>
+            
+            <!-- Diffie-Hellman -->
+            <a href="{% url 'diffie_hellman' %}" class="algorithm-card">
+                <div class="algorithm-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3 class="algorithm-title">Diffie-Hellman</h3>
+                <p class="algorithm-description">Key exchange protocol for secure communication establishment.</p>
+                <span class="algorithm-type">Key Exchange</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
