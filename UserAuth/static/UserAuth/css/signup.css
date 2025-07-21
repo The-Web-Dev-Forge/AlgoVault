@@ -1,0 +1,186 @@
+/* Signup Page Styles - extends login.css */
+@import url('login.css');
+
+/* Additional styles specific to signup */
+.password-strength {
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.strength-bar {
+    width: 100%;
+    height: 4px;
+    background: #e1e5e9;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.strength-fill.weak {
+    width: 25%;
+    background: #dc3545;
+}
+
+.strength-fill.fair {
+    width: 50%;
+    background: #ffc107;
+}
+
+.strength-fill.good {
+    width: 75%;
+    background: #fd7e14;
+}
+
+.strength-fill.strong {
+    width: 100%;
+    background: #28a745;
+}
+
+.strength-text {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+#strengthLevel {
+    font-weight: 600;
+}
+
+#strengthLevel.weak {
+    color: #dc3545;
+}
+
+#strengthLevel.fair {
+    color: #ffc107;
+}
+
+#strengthLevel.good {
+    color: #fd7e14;
+}
+
+#strengthLevel.strong {
+    color: #28a745;
+}
+
+/* Terms checkbox */
+.form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.checkbox-container a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.checkbox-container a:hover {
+    text-decoration: underline;
+}
+
+/* Form validation styles */
+.form-group.error input {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.form-group.success input {
+    border-color: #28a745;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.success-message {
+    color: #28a745;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Password requirements */
+.password-requirements {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.password-requirements h4 {
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.requirements-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.requirements-list li {
+    padding: 0.25rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+}
+
+.requirements-list li.valid {
+    color: #28a745;
+}
+
+.requirements-list li.valid::before {
+    content: '✓';
+    color: #28a745;
+    font-weight: bold;
+}
+
+.requirements-list li:not(.valid)::before {
+    content: '✗';
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Email validation indicator */
+.email-check {
+    position: absolute;
+    right: 3rem;
+    top: 2.2rem;
+    font-size: 1rem;
+}
+
+.email-check.valid {
+    color: #28a745;
+}
+
+.email-check.invalid {
+    color: #dc3545;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .password-requirements {
+        font-size: 0.75rem;
+    }
+    
+    .requirements-list li {
+        padding: 0.2rem 0;
+    }
+}
