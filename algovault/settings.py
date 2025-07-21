@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Cryptography',  # Your custom app for algorithms
+    'UserAuth',  # User authentication app
+    'ChatBot',  # AI Chatbot app
 ]
 
 MIDDLEWARE = [
@@ -120,6 +127,7 @@ STATIC_URL = '/static/'
 # Static files directories
 STATICFILES_DIRS = [
     BASE_DIR / "Cryptography" / "static",
+    BASE_DIR / "ChatBot" / "static",
 ]
 
 # Static files collection directory for production
@@ -129,3 +137,22 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email Configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # For real emails
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For testing
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+# Replace these with your actual email credentials
+# For security, you should use environment variables in production
+EMAIL_HOST_USER = 'omshrav@gmail.com'  # Your actual Gmail address
+EMAIL_HOST_PASSWORD = 'dtyd zisr xkcy uiqb'  # Your Gmail App Password from Google
+DEFAULT_FROM_EMAIL = 'AlgoVault <omshrav@gmail.com>'  # Should match EMAIL_HOST_USER
+
+# For development/testing, you can use console backend to see emails in terminal:
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Gemini API Configuration
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
