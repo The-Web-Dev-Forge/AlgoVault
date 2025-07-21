@@ -2,7 +2,7 @@
 
 {% extends 'base.html' %}
 
-{% block title %}Caesar Cipher Tool{% endblock %}
+{% block title %}Caesar Cipher | AlgoVault{% endblock %}
 
 {% block content %}
 <section class="hero" id="home">
@@ -71,7 +71,6 @@
         
         <div class="shift-visualization" id="shift-visualization">
             <h3>Shift Visualization</h3>
-            <p class="visualization-guide">The visualization structure is ready. Client-side JavaScript can be added to animate the shift based on server results.</p>
             <div id="alphabet-original" class="alphabet-map"></div>
             <div class="arrow"><i class="fas fa-arrow-down"></i></div>
             <div id="alphabet-shifted" class="alphabet-map"></div>
@@ -118,10 +117,13 @@
         <h2 class="section-title">About Caesar Cipher</h2>
         <div class="info-content">
             <div class="info-text">
-                <p>The Caesar cipher is one of the earliest and simplest methods of encryption... (content from original)</p>
+                <p>The Caesar cipher, named after Julius Caesar who used it around 58-50 BCE during the Gallic Wars, is one of the simplest and most widely known encryption techniques in cryptography. Caesar employed this method with a shift of 3 to protect his military communications with generals. The cipher works by shifting each letter in the alphabet by a fixed number of positions - for example, with a shift of 3, 'A' becomes 'D', 'B' becomes 'E', and so on. When the shift reaches the end of the alphabet, it wraps around to the beginning using modular arithmetic.</p>
+                <br>
+                <p>While historically significant as one of the earliest documented encryption methods, the Caesar cipher is extremely vulnerable by modern security standards. With only 25 possible keys (shifts 1-25), it can be easily broken through brute force attacks or frequency analysis. Today, it serves primarily educational purposes, helping students understand basic cryptographic concepts, and is used in puzzles, games, and simple text obfuscation. The cipher's simplicity makes it an excellent introduction to the world of cryptography, demonstrating fundamental principles that evolved into more sophisticated encryption methods like the Vigenère cipher and modern cryptographic algorithms.</p>
             </div>
             <div class="info-image">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Caesar_cipher_left_shift_of_3.svg/1200px-Caesar_cipher_left_shift_of_3.svg.png" alt="Caesar Cipher Illustration">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Caesar_cipher_left_shift_of_3.svg/1200px-Caesar_cipher_left_shift_of_3.svg.png" alt="Caesar Cipher Illustration showing alphabet shift">
+                
             </div>
         </div>
     </section>
