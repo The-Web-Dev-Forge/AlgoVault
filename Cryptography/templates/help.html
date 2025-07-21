@@ -1,0 +1,441 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Help - AlgoVault{% endblock %}
+
+{% block extra_head %}
+<style>
+    .help-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: var(--body-bg);
+        min-height: 100vh;
+        color: var(--light-color);
+    }
+
+    .help-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem 0;
+        background: var(--card-bg);
+        border-radius: 15px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+    }
+
+    .help-header h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+
+    .help-header p {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .help-content {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .help-sidebar {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        height: fit-content;
+        position: sticky;
+        top: 2rem;
+        box-shadow: var(--card-shadow);
+    }
+
+    .help-sidebar h3 {
+        margin-bottom: 1.5rem;
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .help-sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .help-sidebar li {
+        margin-bottom: 0.5rem;
+    }
+
+    .help-sidebar a {
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.5rem;
+        display: block;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .help-sidebar a:hover {
+        background: var(--feature-card-bg);
+        color: var(--primary-color);
+    }
+
+    .help-main {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 3rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+    }
+
+    .help-section {
+        margin-bottom: 3rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .help-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .help-section h2 {
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 600;
+    }
+
+    .help-section h3 {
+        color: var(--light-color);
+        margin: 2rem 0 1rem 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .help-section h4 {
+        color: var(--light-color);
+        margin: 1.5rem 0 0.5rem 0;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+
+    .help-section p {
+        line-height: 1.8;
+        margin-bottom: 1rem;
+        color: var(--text-muted);
+    }
+
+    .help-section ul, .help-section ol {
+        margin: 1rem 0;
+        padding-left: 2rem;
+        color: var(--text-muted);
+    }
+
+    .help-section li {
+        margin-bottom: 0.5rem;
+        line-height: 1.6;
+    }
+
+    .code-example {
+        background: var(--input-bg);
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        font-family: 'Courier New', monospace;
+        border-left: 4px solid var(--primary-color);
+        color: var(--light-color);
+    }
+
+    .algorithm-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .algorithm-card {
+        background: var(--feature-card-bg);
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 1px solid var(--border-color);
+        transition: transform 0.3s ease;
+    }
+
+    .algorithm-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow);
+    }
+
+    .algorithm-card h4 {
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .algorithm-card p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+    }
+
+    .warning-box {
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid #ff6b6b;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        color: var(--light-color);
+    }
+
+    .info-box {
+        background: rgba(255, 0, 0, 0.1);
+        border: 1px solid var(--primary-color);
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        color: var(--light-color);
+    }
+
+    .tip-box {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid #ffc107;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        color: var(--light-color);
+    }
+
+    @media (max-width: 768px) {
+        .help-container {
+            padding: 1rem;
+        }
+        
+        .help-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .help-sidebar {
+            position: static;
+        }
+        
+        .help-header h1 {
+            font-size: 2rem;
+        }
+        
+        .help-main {
+            padding: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="help-container">
+    <div class="help-header">
+        <h1>Help Center</h1>
+        <p>Everything you need to know about using AlgoVault's cryptographic tools and features.</p>
+    </div>
+
+    <div class="help-content">
+        <div class="help-sidebar">
+            <h3>Quick Navigation</h3>
+            <ul>
+                <li><a href="#getting-started">Getting Started</a></li>
+                <li><a href="#algorithms">Algorithm Guide</a></li>
+                <li><a href="#chatbot">AI Assistant</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#contact">Contact Support</a></li>
+            </ul>
+        </div>
+
+        <div class="help-main">
+            <div class="help-section" id="getting-started">
+                <h2><i class="fas fa-play-circle"></i> Getting Started</h2>
+                
+                <h3>Welcome to AlgoVault</h3>
+                <p>AlgoVault is your comprehensive platform for exploring and implementing cryptographic algorithms. Whether you're a student, educator, or professional, our tools help you understand and apply cryptographic concepts effectively.</p>
+
+                <h4>How to Use the Platform</h4>
+                <ol>
+                    <li><strong>Navigate to Tools:</strong> Click on "Tools" from the homepage to access all available algorithms</li>
+                    <li><strong>Select an Algorithm:</strong> Choose from classical ciphers, modern encryption, hash functions, or key exchange protocols</li>
+                    <li><strong>Input Your Data:</strong> Enter your message, keys, or parameters in the provided fields</li>
+                    <li><strong>Process:</strong> Click the encrypt/decrypt/hash button to see results</li>
+                    <li><strong>Learn:</strong> Review the step-by-step explanations and visualizations</li>
+                </ol>
+
+                <div class="info-box">
+                    <strong><i class="fas fa-lightbulb"></i> Pro Tip:</strong> Use our AI chatbot for instant help with any algorithm or cryptographic concept!
+                </div>
+            </div>
+
+            <div class="help-section" id="algorithms">
+                <h2><i class="fas fa-cogs"></i> Algorithm Guide</h2>
+
+                <h3>Classical Ciphers</h3>
+                <div class="algorithm-grid">
+                    <div class="algorithm-card">
+                        <h4>Caesar Cipher</h4>
+                        <p>Simple substitution cipher with fixed shift. Enter your message and shift value (0-25).</p>
+                    </div>
+                    <div class="algorithm-card">
+                        <h4>Vigenère Cipher</h4>
+                        <p>Polyalphabetic cipher using a keyword. Provide your message and a keyword for encryption.</p>
+                    </div>
+                    <div class="algorithm-card">
+                        <h4>Hill Cipher</h4>
+                        <p>Matrix-based cipher. Input dimension, key matrix, and message vector for processing.</p>
+                    </div>
+                </div>
+
+                <h3>Modern Encryption</h3>
+                <div class="algorithm-grid">
+                    <div class="algorithm-card">
+                        <h4>AES (Advanced Encryption Standard)</h4>
+                        <p>Industry-standard encryption. Requires exactly 16-character key and supports detailed round visualization.</p>
+                    </div>
+                    <div class="algorithm-card">
+                        <h4>DES (Data Encryption Standard)</h4>
+                        <p>Legacy encryption standard. Uses 8-byte keys with automatic padding or truncation.</p>
+                    </div>
+                </div>
+
+                <h3>Hash Functions</h3>
+                <div class="algorithm-grid">
+                    <div class="algorithm-card">
+                        <h4>MD5</h4>
+                        <p>128-bit hash function. Supports hex, HEX, and base64 output formats with verification.</p>
+                    </div>
+                    <div class="algorithm-card">
+                        <h4>SHA-512</h4>
+                        <p>Secure 512-bit hash function for enhanced security applications.</p>
+                    </div>
+                </div>
+
+                <h3>Key Exchange</h3>
+                <div class="algorithm-grid">
+                    <div class="algorithm-card">
+                        <h4>Diffie-Hellman</h4>
+                        <p>Secure key exchange protocol. Set prime, generator, and private keys for both parties.</p>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Security Note:</strong> These implementations are for educational purposes. Use production-tested libraries for real-world applications.
+                </div>
+            </div>
+
+            <div class="help-section" id="chatbot">
+                <h2><i class="fas fa-brain"></i> AI Assistant</h2>
+
+                <h3>How to Use the Chatbot</h3>
+                <p>Our AI-powered assistant is available on every page to help you with cryptographic questions, algorithm explanations, and troubleshooting.</p>
+
+                <h4>Features:</h4>
+                <ul>
+                    <li><strong>Algorithm Explanations:</strong> Ask about how any cryptographic algorithm works</li>
+                    <li><strong>Implementation Help:</strong> Get assistance with parameters, inputs, and outputs</li>
+                    <li><strong>Security Guidance:</strong> Learn about best practices and security considerations</li>
+                    <li><strong>Error Resolution:</strong> Get help when something doesn't work as expected</li>
+                </ul>
+
+                <h4>Example Questions:</h4>
+                <div class="code-example">
+                    "How does AES encryption work?"<br>
+                    "What's the difference between MD5 and SHA-512?"<br>
+                    "Why am I getting an error with my Hill cipher key?"<br>
+                    "What's a good key size for DES?"
+                </div>
+
+                <div class="info-box">
+                    <strong><i class="fas fa-info-circle"></i> Access:</strong> Click the red chat icon in the bottom-right corner of any page to start a conversation.
+                </div>
+            </div>
+
+            <div class="help-section" id="troubleshooting">
+                <h2><i class="fas fa-wrench"></i> Troubleshooting</h2>
+
+                <h3>Common Issues and Solutions</h3>
+
+                <h4>Algorithm Not Working</h4>
+                <ul>
+                    <li>Check that all required fields are filled</li>
+                    <li>Verify input formats match the expected requirements</li>
+                    <li>For AES: Ensure key is exactly 16 characters</li>
+                    <li>For Hill Cipher: Verify matrix dimensions and invertibility</li>
+                </ul>
+
+                <h4>Unexpected Results</h4>
+                <ul>
+                    <li>Review algorithm parameters and inputs</li>
+                    <li>Check if you're using the correct operation (encrypt vs decrypt)</li>
+                    <li>Verify key formatting and character encoding</li>
+                </ul>
+
+                <h4>Performance Issues</h4>
+                <ul>
+                    <li>Large inputs may take longer to process</li>
+                    <li>Try smaller test inputs first</li>
+                    <li>Clear browser cache if pages load slowly</li>
+                </ul>
+
+                <h4>Browser Compatibility</h4>
+                <ul>
+                    <li>Use modern browsers (Chrome, Firefox, Safari, Edge)</li>
+                    <li>Enable JavaScript for full functionality</li>
+                    <li>Clear cookies and cache if experiencing issues</li>
+                </ul>
+            </div>
+
+            <div class="help-section" id="faq">
+                <h2><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+
+                <h4>Q: How do I get started with AlgoVault?</h4>
+                <p>A: Navigate to "Tools" from the homepage, select an algorithm, enter your data, and click process. Our AI chatbot is also available for guidance.</p>
+
+                <h4>Q: What algorithms are available?</h4>
+                <p>A: We offer classical ciphers (Caesar, Vigenère, Hill), modern encryption (AES, DES), hash functions (MD5, SHA-512), and key exchange (Diffie-Hellman).</p>
+
+                <h4>Q: Is AlgoVault free to use?</h4>
+                <p>A: Yes, AlgoVault is completely free to use for educational and learning purposes.</p>
+
+                <h4>Q: Can I use AlgoVault on mobile devices?</h4>
+                <p>A: Yes, AlgoVault is fully responsive and works on desktop, tablet, and mobile devices.</p>
+
+                <h4>Q: How do I report issues or provide feedback?</h4>
+                <p>A: Use our AI chatbot available on every page to report issues or provide feedback.</p>
+            </div>
+
+            <div class="help-section" id="contact">
+                <h2><i class="fas fa-envelope"></i> Contact Support</h2>
+
+                <h3>Need More Help?</h3>
+                <p>If you can't find the answer you're looking for, we're here to help!</p>
+
+                <h4>Quick Support Options:</h4>
+                <ul>
+                    <li><strong>AI Chatbot:</strong> Available 24/7 on every page for instant assistance</li>
+                    <li><strong>Documentation:</strong> Comprehensive guides available in each algorithm section</li>
+                    <li><strong>Community:</strong> Join our user community for peer support and discussions</li>
+                </ul>
+
+                <div class="info-box">
+                    <strong><i class="fas fa-rocket"></i> Getting Started:</strong> New to cryptography? Start with the Caesar cipher and work your way up to more complex algorithms!
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
