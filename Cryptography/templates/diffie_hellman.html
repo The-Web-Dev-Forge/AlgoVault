@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Diffie-Hellman Key Exchange Visualizer{% endblock %}
+{% block title %}Diffie Hellman | AlgoVault{% endblock %}
 
 {% block extra_head %}
     {# This block allows you to add page-specific CSS links in your base.html #}
@@ -12,7 +12,7 @@
 <section class="hero" id="home">
     <div class="container">
         <h1>Diffie-Hellman Key Exchange</h1>
-        <p>Securely establish a shared secret between two parties over an insecure channel. This tool visualizes the entire process step-by-step.</p>
+        <p>Securely establish a shared secret between two parties over an insecure channel. This tool visualizes the entire process step-by-step, ensuring clarity and understanding.</p>
     </div>
 </section>
 
@@ -191,18 +191,17 @@
         <div class="info-content">
             <div class="info-text">
                 <p>The Diffie-Hellman (DH) Key Exchange is a cryptographic protocol that allows two parties to establish a shared secret over a public, insecure channel. Published in 1976 by Whitfield Diffie and Martin Hellman, it was one of the first practical examples of public-key cryptography.</p>
-                <p>The core idea is often explained with a paint mixing analogy: Alice and Bob start with a common paint color (public). They each add their own secret color and mix. They exchange their mixed colors publicly. Finally, they each add their original secret color to the mix they received. The result is an identical final color that only they know, as it's computationally infeasible for an eavesdropper to separate the mixed colors.</p>
-                <p>Mathematically, it uses modular arithmetic and the difficulty of computing discrete logarithms. While the DH method itself is resistant to sniffing attacks, it is vulnerable to Man-in-the-Middle (MitM) attacks if used without authentication (e.g., digital signatures).</p>
+                <br><p>The core idea is often explained with a paint mixing analogy: Alice and Bob start with a common paint color (public). They each add their own secret color and mix. They exchange their mixed colors publicly. Finally, they each add their original secret color to the mix they received. The result is an identical final color that only they know, as it's computationally infeasible for an eavesdropper to separate the mixed colors.</p>
+                <br><p>Mathematically, it uses modular arithmetic and the difficulty of computing discrete logarithms. While the DH method itself is resistant to sniffing attacks, it is vulnerable to Man-in-the-Middle (MitM) attacks if used without authentication (e.g., digital signatures).</p>
             </div>
             <div class="info-image">
-                <img src="https://i.imgur.com/u1n2tSc.png" alt="Diffie-Hellman Paint Analogy">
+                <img src="https://miro.medium.com/v2/resize:fit:1200/1*Ts5kh3nrMp2LP2uBT35OHQ.jpeg" alt="Diffie-Hellman Paint Analogy">
             </div>
         </div>
     </section>
     
     <section class="info-section" id="help">
         <h2 class="section-title">How to Use</h2>
-        <div class="info-content">
             <div class="info-text">
                 <ol>
                     <li><strong>Public Parameters:</strong> Alice and Bob agree on a public prime number (p) and a generator (g). You can use the defaults or provide your own.</li>
@@ -212,7 +211,6 @@
                     <li><strong>Randomize:</strong> Use the "Randomize Parameters" button to try the exchange with different valid numbers.</li>
                 </ol>
             </div>
-        </div>
     </section>
 </main>
 {% endblock %}
