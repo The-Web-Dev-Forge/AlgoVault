@@ -1,0 +1,435 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About AlgoVault{% endblock %}
+
+{% block extra_head %}
+<style>
+    .about-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: var(--body-bg);
+        min-height: 100vh;
+        color: var(--light-color);
+    }
+
+    .about-header {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 2rem 0;
+        background: var(--card-bg);
+        border-radius: 15px;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+    }
+
+    .about-header h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+
+    .about-header p {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .about-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .about-card {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: var(--card-shadow);
+    }
+
+    .about-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--glow-effect), var(--card-shadow);
+    }
+
+    .about-card i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+
+    .about-card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        color: var(--light-color);
+        font-weight: 600;
+    }
+
+    .about-card p {
+        line-height: 1.6;
+        color: var(--text-muted);
+    }
+
+    .features-section {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 3rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .feature-item {
+        text-align: center;
+        padding: 2rem;
+        background: var(--feature-card-bg);
+        border-radius: 15px;
+        border: 1px solid var(--border-color);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .feature-item:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--glow-effect), var(--card-shadow);
+    }
+
+    .feature-item i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+
+    .feature-item h4 {
+        margin-bottom: 1rem;
+        color: var(--light-color);
+        font-weight: 600;
+        font-size: 1.5rem;
+    }
+
+    .feature-item p {
+        color: var(--text-muted);
+        font-size: 1rem;
+        line-height: 1.6;
+        flex-grow: 1;
+    }
+
+    .team-section {
+        text-align: center;
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 3rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+    }
+
+    .team-section h2 {
+        margin-bottom: 2rem;
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+
+    .team-section p {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--text-muted);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: 768px) {
+        .about-container {
+            padding: 1rem;
+        }
+        
+        .about-header h1 {
+            font-size: 2rem;
+        }
+        
+        .about-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .features-section,
+        .team-section,
+        .tech-section {
+            padding: 2rem 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tech-grid {
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tech-item {
+            padding: 1.5rem 1rem;
+        }
+
+        .tech-item i {
+            font-size: 2.5rem;
+        }
+
+        .tech-item span {
+            font-size: 0.9rem;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .feature-item {
+            padding: 1.5rem;
+        }
+
+        .feature-item i {
+            font-size: 2.5rem;
+        }
+
+        .feature-item h4 {
+            font-size: 1.3rem;
+        }
+    }
+    /* Technology Section */
+.tech-section {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 3rem;
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+}
+
+.tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.tech-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    background: var(--feature-card-bg);
+    border-radius: 15px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.tech-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--glow-effect), var(--card-shadow);
+}
+
+.tech-item i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.tech-item span {
+    color: var(--light-color);
+    font-weight: 500;
+    font-size: 1rem;
+}    .section-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--light-color);
+        font-weight: 700;
+    }
+
+    .section-subtitle {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+        line-height: 1.8;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="about-container">
+    <div class="about-header">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            <i class="fas fa-shield-alt" style="font-size: 3.5rem; color: var(--primary-color); margin-right: 1rem;"></i>
+            <h1 style="margin: 0;"><span style="color: var(--light-color);">About</span> <span style="color: var(--primary-color);">AlgoVault</span></h1>
+        </div>
+        <p>Your comprehensive platform for learning and implementing cryptographic algorithms with professional-grade tools and educational resources.</p>
+    </div>
+
+    <div class="about-content">
+        <div class="about-card">
+            <i class="fas fa-shield-alt"></i>
+            <h3>Security First</h3>
+            <p>AlgoVault implements industry-standard cryptographic algorithms with multiple language support including C++, Java, and Python. Our implementations follow established security practices and protocols.</p>
+        </div>
+
+        <div class="about-card">
+            <i class="fas fa-graduation-cap"></i>
+            <h3>Educational Focus</h3>
+            <p>Designed for students, educators, and professionals to understand cryptographic concepts through hands-on implementation. Each algorithm includes detailed explanations and step-by-step visualizations.</p>
+        </div>
+
+        <div class="about-card">
+            <i class="fas fa-code"></i>
+            <h3>Multi-Language Support</h3>
+            <p>Experience algorithms implemented in C++, Java, and Python with automatic fallback systems. Compare performance and understand implementation differences across programming languages.</p>
+        </div>
+
+        <div class="about-card">
+            <i class="fas fa-robot"></i>
+            <h3>AI-Powered Assistant</h3>
+            <p>Get instant help with our integrated chatbot that can explain algorithms, debug issues, and provide cryptographic guidance whenever you need assistance.</p>
+        </div>
+    </div>
+
+    <div class="features-section">
+        <h2 style="text-align: center; margin-bottom: 2rem; color: var(--light-color); font-size: 2.5rem; font-weight: 700;">Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <i class="fas fa-key"></i>
+                <h4>Classical Ciphers</h4>
+                <p>Caesar, Vigenère, and Hill ciphers with interactive interfaces</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-lock"></i>
+                <h4>Modern Encryption</h4>
+                <p>AES and DES encryption with detailed round-by-round visualization</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-fingerprint"></i>
+                <h4>Hash Functions</h4>
+                <p>MD5 and SHA-512 hashing with multiple output formats</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-handshake"></i>
+                <h4>Key Exchange</h4>
+                <p>Diffie-Hellman key exchange with step-by-step calculations</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-chart-line"></i>
+                <h4>Performance Analysis</h4>
+                <p>Compare implementation speeds across different languages</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-mobile-alt"></i>
+                <h4>Responsive Design</h4>
+                <p>Works seamlessly on desktop, tablet, and mobile devices</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="team-section">
+        <h2 style="color: var(--light-color);">Our Mission</h2>
+        <p>
+            AlgoVault was created to bridge the gap between theoretical cryptography and practical implementation. 
+            We believe that understanding cryptographic algorithms is essential in today's digital world, whether you're 
+            a student learning the fundamentals, an educator teaching security concepts, or a professional implementing 
+            secure systems.
+        </p>
+        <br>
+        <p>
+            Our platform combines rigorous academic standards with user-friendly interfaces, making complex cryptographic 
+            concepts accessible to everyone. We're committed to providing accurate, efficient, and educational tools that 
+            help users not just use cryptographic algorithms, but truly understand how they work.
+        </p>
+    </div>
+    <!-- Technology Section -->
+    <div class="tech-section">
+        <div class="section-header">
+            <h2 class="section-title">Built with Modern Technology</h2>
+            <p class="section-subtitle">Leveraging cutting-edge tools for optimal performance and security</p>
+        </div>
+        <div class="tech-grid">
+            <div class="tech-item">
+                <i class="fab fa-python"></i>
+                <span>Python</span>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-cuttlefish"></i>
+                <span>C++</span>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-java"></i>
+                <span>Java</span>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-js-square"></i>
+                <span>JavaScript</span>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-html5"></i>
+                <span>HTML5</span>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-css3-alt"></i>
+                <span>CSS3</span>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-database"></i>
+                <span>SQLite</span>
+            </div>
+            <div class="tech-item">
+                <i class="fab fa-python"></i>
+                <span>Django</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Features Section -->
+    <div class="features-section">
+        <h2 style="text-align: center; margin-bottom: 2rem; color: var(--light-color); font-size: 2.5rem; font-weight: 700;">Why Choose AlgoVault?</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <i class="fas fa-shield-virus"></i>
+                <h4>Security Focused</h4>
+                <p>Industry-standard implementations with rigorous testing and validation for real-world applications</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-users"></i>
+                <h4>Community Driven</h4>
+                <p>Built by developers for developers with continuous feedback and improvement from the community</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-rocket"></i>
+                <h4>Performance Optimized</h4>
+                <p>Efficient algorithms with performance benchmarks and optimization techniques for speed and reliability</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-book-open"></i>
+                <h4>Documentation</h4>
+                <p>Comprehensive guides, tutorials, and API documentation to help you understand every aspect</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
