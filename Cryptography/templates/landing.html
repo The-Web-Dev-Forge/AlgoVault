@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Welcome to AlgoVault{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/landing.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="landing-container">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1 class="hero-title">
+                    Welcome to <br>
+                    <span class="brand-gradient" id="typewriter-text"></span>
+                </h1>
+                <h2 class="hero-subtitle">
+                    Your Ultimate Cryptography Learning Platform
+                </h2>
+                <p class="hero-description">
+                    Master the art of cryptography with our comprehensive collection of interactive tools. 
+                    From ancient Caesar ciphers to modern AES encryption, explore the algorithms 
+                    that protect our digital world. Learn, practice, and become a cryptography expert!
+                </p>
+                <div class="hero-buttons">
+                    <a href="{% url 'UserAuth:signup' %}" class="btn btn-primary hero-btn">
+                        <i class="fas fa-rocket"></i>
+                        Start Learning
+                    </a>
+                    <a href="{% url 'UserAuth:login' %}" class="btn btn-secondary hero-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </a>
+                </div>
+                
+                <!-- Key Features Badges -->
+                <div class="hero-badges">
+                    <span class="badge"><i class="fas fa-shield-alt"></i> 8+ Algorithms</span>
+                    <span class="badge"><i class="fas fa-graduation-cap"></i> Interactive Learning</span>
+                    <span class="badge"><i class="fas fa-code"></i> Hands-on Practice</span>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="cipher-wheel">
+                    <div class="wheel-inner">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="wheel-outer">
+                        <div class="wheel-segment"><span>A</span></div>
+                        <div class="wheel-segment"><span>E</span></div>
+                        <div class="wheel-segment"><span>S</span></div>
+                        <div class="wheel-segment"><span>D</span></div>
+                        <div class="wheel-segment"><span>M</span></div>
+                        <div class="wheel-segment"><span>H</span></div>
+                        <div class="wheel-segment"><span>C</span></div>
+                        <div class="wheel-segment"><span>V</span></div>
+                    </div>
+                </div>
+                
+                <!-- Floating Elements -->
+                <div class="floating-elements">
+                    <div class="floating-icon floating-icon-1">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="floating-icon floating-icon-2">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="floating-icon floating-icon-3">
+                        <i class="fas fa-fingerprint"></i>
+                    </div>
+                    <div class="floating-icon floating-icon-4">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title">Powerful Cryptographic Tools</h2>
+            <p class="section-description">
+                Everything you need to understand and implement cryptographic algorithms
+            </p>
+            
+            <div class="features-grid">
+                <div class="feature-card classical">
+                    <div class="feature-icon">
+                        <i class="fas fa-scroll"></i>
+                    </div>
+                    <h3>Classical Ciphers</h3>
+                    <p>Explore historical encryption methods including Caesar, Hill, and Vigenère ciphers with interactive tools and detailed explanations.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> <a href="{% url 'caesar_cipher' %}">Caesar Cipher</a></li>
+                        <li><i class="fas fa-check"></i> <a href="{% url 'hill' %}">Hill Cipher</a></li>
+                        <li><i class="fas fa-check"></i> <a href="{% url 'vigenere' %}">Vigenère Cipher</a></li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card modern">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Modern Encryption</h3>
+                    <p>Work with industry-standard encryption algorithms used in real-world applications for securing sensitive data.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> <a href="{% url 'aes' %}">AES (Advanced Encryption Standard)</a></li>
+                        <li><i class="fas fa-check"></i> <a href="{% url 'des' %}">DES (Data Encryption Standard)</a></li>
+                        <li><i class="fas fa-check"></i> RSA Implementation</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card hash">
+                    <div class="feature-icon">
+                        <i class="fas fa-fingerprint"></i>
+                    </div>
+                    <h3>Hash Functions</h3>
+                    <p>Learn about data integrity and authentication with cryptographic hash functions, secure algorithms, and message digests.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> <a href="{% url 'md5' %}">MD5 Algorithm</a></li>
+                        <li><i class="fas fa-check"></i> <a href="{% url 'sha512' %}">SHA-512 Implementation</a></li>
+                        <li><i class="fas fa-check"></i> Hash Verification</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card exchange">
+                    <div class="feature-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3>Key Exchange</h3>
+                    <p>Understand secure key distribution and exchange protocols that enable secure communication over insecure channels.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> <a href="{% url 'diffie_hellman' %}">Diffie-Hellman Protocol</a></li>
+                        <li><i class="fas fa-check"></i> Key Generation</li>
+                        <li><i class="fas fa-check"></i> Security Analysis</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card ai-assistant">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI Assistant</h3>
+                    <p>Get instant help and explanations about cryptographic concepts with our AI-powered assistant using Gemini AI.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> <a href="{% url 'ChatBot:chatbot' %}">Interactive Chat Interface</a></li>
+                        <li><i class="fas fa-check"></i> Algorithm Explanations</li>
+                        <li><i class="fas fa-check"></i> Concept Clarification</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose AlgoVault Section -->
+    <section class="why-section">
+        <div class="container">
+            <div class="why-content">
+                <div class="why-text">
+                    <h2>Why Choose AlgoVault?</h2>
+                    <div class="why-features">
+                        <div class="why-item">
+                            <div class="why-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="why-details">
+                                <h4>Educational Excellence</h4>
+                                <p>Learn cryptography through hands-on experience with detailed explanations and visual demonstrations.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="why-item">
+                            <div class="why-icon">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="why-details">
+                                <h4>Multiple Implementations</h4>
+                                <p>Each algorithm includes implementations in C++, Java, and Python for comprehensive understanding.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="why-item">
+                            <div class="why-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="why-details">
+                                <h4>Security Focused</h4>
+                                <p>Learn security best practices and understand the strengths and weaknesses of different algorithms.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="why-item">
+                            <div class="why-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="why-details">
+                                <h4>Progress Tracking</h4>
+                                <p>Monitor your learning journey with personalized dashboards and activity tracking.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="why-visual">
+                    <div class="security-layers">
+                        <div class="layer layer-1">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div class="layer layer-2">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <div class="layer layer-3">
+                            <i class="fas fa-key"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Master Cryptography?</h2>
+                <p>Join thousands of students, developers, and security professionals who trust AlgoVault for cryptographic education.</p>
+                <div class="cta-buttons">
+                    <a href="{% url 'UserAuth:signup' %}" class="btn btn-primary cta-btn">
+                        <i class="fas fa-user-plus"></i>
+                        Create Your Account
+                    </a>
+                    <a href="#features" class="btn btn-secondary cta-btn">
+                        <i class="fas fa-info-circle"></i>
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate the cipher wheel
+    const wheel = document.querySelector('.wheel-outer');
+    if (wheel) {
+        let rotation = 0;
+        setInterval(() => {
+            rotation += 0.5;
+            wheel.style.transform = `rotate(${rotation}deg)`;
+        }, 50);
+    }
+
+    // Animate feature cards on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+            }
+        });
+    }, observerOptions);
+
+    // Observe feature cards
+    document.querySelectorAll('.feature-card, .why-item').forEach(card => {
+        observer.observe(card);
+    });
+
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Add parallax effect to hero section
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.5;
+        const heroVisual = document.querySelector('.hero-visual');
+        if (heroVisual) {
+            heroVisual.style.transform = `translateY(${rate}px)`;
+        }
+    });
+
+    // Typewriter effect for AlgoVault with continuous loop
+    function typeWriter(element, text, speed = 80) {
+        let i = 0;
+        
+        function type() {
+            // Clear and start typing
+            element.innerHTML = '';
+            i = 0;
+            
+            function typeLoop() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(typeLoop, speed);
+                } else {
+                    // Brief pause when complete, then restart
+                    setTimeout(() => {
+                        type(); // Restart the typing
+                    }, 1000); // 1 second pause before restarting
+                }
+            }
+            
+            typeLoop();
+        }
+        
+        // Start typing after initial delay
+        setTimeout(type, 500);
+    }
+
+    // Initialize typewriter effect
+    const typewriterElement = document.getElementById('typewriter-text');
+    if (typewriterElement) {
+        typeWriter(typewriterElement, 'AlgoVault', 80);
+    }
+});
+</script>
+{% endblock %}
