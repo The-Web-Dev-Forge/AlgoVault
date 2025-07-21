@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}AI Cryptography Assistant - AlgoVault{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'ChatBot/css/chatbot.css' %}">
+<style>
+    /* Hide floating widget on chatbot page */
+    .floating-chat-widget {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chatbot-container">
+    <!-- Header Section -->
+    <div class="chatbot-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1 class="page-title">
+                        <i class="fas fa-robot"></i>
+                        AI Cryptography Assistant
+                    </h1>
+                    <p class="page-subtitle">
+                        Get instant help with cryptographic algorithms and concepts powered by Gemini AI
+                    </p>
+                </div>
+                <div class="header-visual">
+                    <div class="ai-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="chat-interface">
+        <div class="container">
+            <div class="chat-wrapper">
+                <!-- Chat Messages Area -->
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Welcome Message -->
+                    <div class="message bot-message">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                <p>Hello! I'm your AI cryptography assistant. I'm here to help you understand cryptographic algorithms, explain concepts, and answer any questions about the algorithms available on AlgoVault.</p>
+                                <p>Feel free to ask me about:</p>
+                                <ul>
+                                    <li>Caesar Cipher and other classical ciphers</li>
+                                    <li>Modern encryption like AES and DES</li>
+                                    <li>Hash functions (MD5, SHA-512)</li>
+                                    <li>Key exchange protocols</li>
+                                    <li>Cryptographic concepts and theory</li>
+                                </ul>
+                                <p>What would you like to learn about today?</p>
+                            </div>
+                            <div class="message-time">
+                                <span id="welcomeTime"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="typing-content">
+                        <div class="typing-bubble">
+                            <div class="typing-dots">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input-container">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Ask me anything about cryptography..."
+                            rows="1"
+                            maxlength="1000"
+                        ></textarea>
+                        <button id="sendButton" type="button" class="send-button">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                    <div class="input-footer">
+                        <span class="char-count">
+                            <span id="charCount">0</span>/1000
+                        </span>
+                        <span class="powered-by">
+                            Powered by <i class="fab fa-google"></i> Gemini AI
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Questions -->
+    <div class="quick-questions">
+        <div class="container">
+            <h3>Quick Questions</h3>
+            <div class="question-cards">
+                <div class="question-card" data-question="What is the Caesar cipher and how does it work?">
+                    <i class="fas fa-scroll"></i>
+                    <span>Caesar Cipher Basics</span>
+                </div>
+                <div class="question-card" data-question="How does AES encryption work?">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>AES Encryption</span>
+                </div>
+                <div class="question-card" data-question="What's the difference between MD5 and SHA-512?">
+                    <i class="fas fa-fingerprint"></i>
+                    <span>Hash Functions</span>
+                </div>
+                <div class="question-card" data-question="Explain the Diffie-Hellman key exchange">
+                    <i class="fas fa-key"></i>
+                    <span>Key Exchange</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'ChatBot/js/chatbot.js' %}"></script>
+{% endblock %}
