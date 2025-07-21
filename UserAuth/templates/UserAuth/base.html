@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AlgoVault Authentication{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'UserAuth/css/styles.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Dropdown overlay for mobile -->
+    <div class="dropdown-overlay" id="dropdown-overlay"></div>
+    
+    <header>
+        <div class="container">
+            <div class="navbar">
+                <div class="navbar-left">
+                    <a href="{% url 'landing' %}" class="logo">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>AlgoVault</span>
+                    </a>
+                </div>
+                <div class="navbar-center">
+                    <ul class="nav-links">
+                        <li><a href="{% url 'landing' %}">Home</a></li>
+                        <li><a href="{% url 'tools' %}">Tools</a></li>
+                        <li><a href="{% url 'ChatBot:chatbot' %}">AI Assistant</a></li>
+                        <li><a href="{% url 'about' %}">About</a></li>
+                        <li><a href="{% url 'help' %}">Help</a></li>
+                    </ul>
+                </div>
+                <div class="navbar-right">
+                    {% if user.is_authenticated %}
+                        <span class="user-greeting">Welcome, {{ user.first_name|default:user.username }}!</span>
+                        <a href="{% url 'UserAuth:logout' %}" class="btn btn-outline">Logout</a>
+                    {% else %}
+                        {% if request.resolver_match.url_name == 'signup' %}
+                            <a href="{% url 'UserAuth:login' %}" class="btn btn-outline">Login</a>
+                        {% elif request.resolver_match.url_name == 'login' %}
+                            <a href="{% url 'UserAuth:signup' %}" class="btn btn-red">Sign Up</a>
+                        {% elif request.resolver_match.url_name == 'forgot_password' or request.resolver_match.url_name == 'reset_password' %}
+                            <a href="{% url 'UserAuth:login' %}" class="btn btn-outline">Login</a>
+                        {% else %}
+                            <a href="{% url 'UserAuth:login' %}" class="btn btn-outline">Login</a>
+                            <a href="{% url 'UserAuth:signup' %}" class="btn btn-red">Sign Up</a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="theme-toggle-buttons">
+        <button id="theme-toggle-btn" aria-label="Toggle light and dark mode" title="Toggle light and dark mode" class="btn">
+            <i id="theme-toggle-icon" class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <main class="main container">
+        <!-- Notification container -->
+        <div class="notification" id="notification" style="display: none;"></div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="notification {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4 class="footer-title">About AlgoVault</h4>
+                    <p>Enterprise-grade encryption and hashing tools for security professionals and developers.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">Quick Links</h4>
+                    <div class="footer-links">
+                        <a href="/">Home</a>
+                        <a href="#tools">Tools</a>
+                        <a href="#documentation">Documentation</a>
+                        <a href="#contact">Contact</a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 class="footer-title">Contact Us</h4>
+                    <div class="footer-links">
+                        <a href="mailto:support@algovault.com"><i class="far fa-envelope"></i> support@algovault.com</a>
+                        <a href="tel:+1234567890"><i class="fas fa-phone-alt"></i> +1 (234) 567-890</a>
+                        <a href="#"><i class="fas fa-map-marker-alt"></i> 202-Praachi Home, Bangalore</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 AlgoVault. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Main JavaScript file -->
+    <script src="{% static 'UserAuth/js/scripts.js' %}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
