@@ -1,13 +1,19 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}MD5 Hash Generator{% endblock %}
+{% block title %}MD5 | AlgoVault{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/md5.css' %}">
 {% endblock %}
 
 {% block content %}
+<section class="hero" id="home">
+    <div class="container">
+        <h1>MD5 Hash Generator</h1>
+        <p>Generate secure MD5 cryptographic hashes for data integrity verification, digital signatures, and password storage. Our enterprise-grade MD5 tool provides reliable hash generation with comprehensive output format options and capabilities.</p>
+    </div>
+</section>
 {% csrf_token %}
 <main class="main container" id="md5-tool-section">
     <div class="notification success" id="notification"></div>
@@ -292,12 +298,12 @@
 
         <div class="info-content">
             <div class="info-text">
-                <p>MD5 (Message-Digest Algorithm 5) is a widely used cryptographic hash function that produces a 128-bit (16-byte) hash value, typically expressed as a 32-character hexadecimal number. It was designed by Ron Rivest in 1991.</p>
-                <p>Initially designed for use as a cryptographic secure hash algorithm, MD5 has been found to suffer from extensive vulnerabilities, and is no longer recommended for use as a security measure. However, it is still commonly used for checking data integrity and detecting unintentional data corruption.</p>
+                <p>MD5 (Message-Digest Algorithm 5) is a widely used cryptographic hash function that produces a 128-bit (16-byte) hash value, typically expressed as a 32-character hexadecimal number. It was designed by Ron Rivest in 1991.</p><br>
+                <p>Initially designed for use as a cryptographic secure hash algorithm, MD5 has been found to suffer from extensive vulnerabilities, and is no longer recommended for use as a security measure. However, it is still commonly used for checking data integrity and detecting unintentional data corruption.</p><br>
                 <p>The MD5 algorithm processes data in 512-bit chunks, which are broken down into 16 32-bit words. The output is a set of four 32-bit blocks which combine to form the 128-bit hash. While collisions can be generated, for simple data integrity checks where malicious attacks are not a concern, MD5 can still be a quick and efficient solution.</p>
             </div>
             <div class="info-image">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/MD5_algorithm_diagram.svg" alt="MD5 Algorithm Diagram">
+                <img src="https://media.geeksforgeeks.org/wp-content/uploads/20240720152453/Untitled-design_11zon-(1)-(1).jpg" alt="MD5 Algorithm Diagram">
             </div>
         </div>
     </section>
@@ -310,11 +316,7 @@
                 <ol>
                     <li><strong>Enter Input Data:</strong> Type or paste the text for which you want to generate an MD5 hash.</li>
                     <li><strong>Select Output Format:</strong> Choose the desired format for the hash (Hexadecimal lowercase, uppercase, or Base64).</li>
-                    <li><strong>Select Operation:</strong> Choose to 'Generate Hash', 'Verify Hash', or 'Hash Analysis'.
-                        <ul>
-                            <li>For 'Verify Hash', enter the 'Expected Hash' to compare against the generated hash.</li>
-                        </ul>
-                    </li>
+                    <li><strong>Select Operation:</strong> Choose to 'Generate Hash', 'Verify Hash', or 'Hash Analysis'.For 'Verify Hash', enter the 'Expected Hash' to compare against the generated hash.</li>
                     <li><strong>Process:</strong> Click the "Process" button to perform the selected operation.</li>
                     <li><strong>View Result:</strong> The result will appear in the result box below. You can copy it to your clipboard.</li>
                 </ol>
