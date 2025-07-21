@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}CipherPro | Enterprise-Grade Hill Cipher Tool{% endblock %}
+{% block title %}Hill Cipher | AlgoVault{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/hill.css' %}">
@@ -74,7 +74,7 @@
                 <i class="fas fa-copy"></i> Copy to Clipboard
             </button>
         </div>
-        <div class="shift-visualization" id="shift-visualization">
+        <div class="shift-visualization" id="shift-visualization" style="display:none;">
             <div style="text-align: center; margin-bottom: 1.5rem;">
                 <h3 style="color: var(--primary-color); font-size: 1.6rem; margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                     <i class="fas fa-calculator"></i>
@@ -97,32 +97,32 @@
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-th"></i></div>
             <h3 class="feature-title">Polygraphic Substitution</h3>
-            <p>Encrypts blocks of letters (digraphs, trigraphs) simultaneously, effectively obscuring individual letter frequencies[5][9].</p>
+            <p>Encrypts blocks of letters (digraphs, trigraphs) simultaneously, effectively obscuring individual letter frequencies.</p>
         </div>
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-cogs"></i></div>
             <h3 class="feature-title">Linear Algebra Core</h3>
-            <p>Based on matrix multiplication and modular arithmetic, making it a classic example of applying linear algebra to cryptography[7][8].</p>
+            <p>Based on matrix multiplication and modular arithmetic, making it a classic example of applying linear algebra to cryptography.</p>
         </div>
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-key"></i></div>
             <h3 class="feature-title">Invertible Key Matrix</h3>
-            <p>Uses a square matrix as its key, which must be invertible to allow for the decryption of the ciphertext[5][6].</p>
+            <p>Uses a square matrix as its key, which must be invertible to allow for the decryption of the ciphertext.</p>
         </div>
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-cubes"></i></div>
             <h3 class="feature-title">Block-Based Operation</h3>
-            <p>As a block cipher, it processes plaintext in fixed-size blocks, a foundational concept in modern symmetric encryption[5][7].</p>
+            <p>As a block cipher, it processes plaintext in fixed-size blocks, a foundational concept in modern symmetric encryption.</p>
         </div>
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
             <h3 class="feature-title">Resistance to Analysis</h3>
-            <p>Significantly more resistant to frequency analysis attacks compared to simple substitution ciphers that operate on single letters[7].</p>
+            <p>Significantly more resistant to frequency analysis attacks compared to simple substitution ciphers that operate on single letters.</p>
         </div>
         <div class="feature-card">
             <div class="feature-icon"><i class="fas fa-ruler-combined"></i></div>
             <h3 class="feature-title">Scalable Complexity</h3>
-            <p>The complexity and security of the cipher increase with the dimensions of the key matrix (e.g., 3x3 is stronger than 2x2)[5][7].</p>
+            <p>The complexity and security of the cipher increase with the dimensions of the key matrix (e.g., 3x3 is stronger than 2x2).</p>
         </div>
     </div>
 
@@ -131,11 +131,11 @@
         <h2 class="section-title">About the Hill Cipher</h2>
         <div class="info-content">
             <div class="info-text">
-                <p>Invented by mathematician Lester S. Hill in 1929, the Hill cipher is a classical polygraphic substitution cipher based on linear algebra[4][8]. It was one of the first ciphers to operate on groups of more than three letters at once, representing a significant advancement in cryptography for its time[4].</p>
-                <p>The cipher transforms blocks of plaintext letters into numeric vectors and uses matrix multiplication with a secret key matrix to produce ciphertext vectors[6][7]. Decryption is achieved by multiplying the ciphertext vectors by the inverse of the key matrix[5]. A critical requirement is that the key matrix must be invertible modulo 26; otherwise, decryption is impossible[5][7]. While vulnerable to known-plaintext attacks due to its linearity, the Hill cipher remains a foundational algorithm for understanding the application of mathematics in cryptography[7].</p>
+                <p>The Hill Cipher, invented by mathematician Lester S. Hill in 1929, is a classical encryption technique that uses <em>linear algebra</em> to secure messages. Unlike simple substitution ciphers, the Hill Cipher encrypts blocks of letters at a time, making it a polygraphic cipher. It converts letters into numbers (A=0 to Z=25), forms them into vectors, and multiplies them by a secret key matrix. The results are then taken modulo 26 and converted back into letters to produce the ciphertext. This method introduced a more mathematical approach to encryption and was a major step forward in classical cryptography.</p> <br>
+                <p>To decrypt a Hill-encrypted message, the inverse of the key matrix modulo 26 is used. However, this matrix must be <em>invertible</em>, or decryption won't work. While the Hill Cipher is no longer considered secure due to its vulnerability to known-plaintext attacks, it remains a valuable educational tool. It’s widely studied for its elegant use of algebra and its role in the development of modern cryptographic techniques.</p>
             </div>
             <div class="info-image">
-                <img src="https://i.ytimg.com/vi/rS2aJgGUSvE/maxresdefault.jpg" alt="Hill Cipher Matrix Multiplication Diagram">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Hill%27s_message_protector.png/1920px-Hill%27s_message_protector.png" alt="Hill Cipher Matrix Multiplication Diagram">
             </div>
         </div>
     </section>
@@ -146,8 +146,8 @@
             <div class="info-text">
                 <ol>
                     <li><strong>Enter Your Message:</strong> Type or paste the text you want to process. Non-alphabetic characters are automatically removed.</li>
-                    <li><strong>Choose Key Method:</strong> Select "Enter Key Matrix" to input numbers directly, or "Enter Key Word" to automatically generate a matrix from a word[5].</li>
-                    <li><strong>Provide Key:</strong> Enter the key matrix values or a keyword. The resulting matrix must be invertible modulo 26 for decryption to work[5].</li>
+                    <li><strong>Choose Key Method:</strong> Select "Enter Key Matrix" to input numbers directly, or "Enter Key Word" to automatically generate a matrix from a word.</li>
+                    <li><strong>Provide Key:</strong> Enter the key matrix values or a keyword. The resulting matrix must be invertible modulo 26 for decryption to work.</li>
                     <li><strong>Select Operation:</strong> Choose whether to "Encrypt" or "Decrypt" your message.</li>
                     <li><strong>Process and Visualize:</strong> Click "Process" to see the result and a step-by-step visualization of the matrix calculations.</li>
                 </ol>
@@ -459,6 +459,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // --- Visualization ---
         visualizeHillCipher(message, keyMatrix, operation, allResultVectors, cleanMessageBlocks, inverseKeyMatrixForViz);
+        
+        // Show the visualization section
+        document.getElementById('shift-visualization').style.display = 'block';
 
         processBtn.disabled = false;
         processBtn.innerHTML = '<span class="btn-text">Process</span><i class="fas fa-cog"></i>';
@@ -566,6 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
         hillVisualizationSteps.innerHTML = '';
         visualizationInfo.innerHTML = '<i class="fas fa-lightbulb"></i> Enter a message and click "Process" to see the step-by-step visualization.';
         visualizationInfo.classList.remove('active');
+        document.getElementById('shift-visualization').style.display = 'none';
     }
 
     function copyToClipboard() {
