@@ -1,17 +1,17 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}CipherPro | SHA-512 Hash Tool{% endblock %}
+{% block title %}SHA-512 | AlgoVault{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/sha512.css' %}">
 {% endblock %}
 
 {% block content %}
-<section class="hero" id="home">
+<section class="hero" id="home" style="height: 332px;">
     <div class="container">
         <h1>SHA-512 Hash Solution</h1>
-        <p>Generate secure SHA-512 hashes for your data with a detailed, interactive visualization of the hashing process.</p>
+        <p>Generate secure SHA-512 hashes for your data with a detailed, step-by-step visualization of the hashing process. Interactively explore each stage, from preprocessing to the final 512-bit output.</p>
     </div>
 </section>
 
@@ -151,11 +151,11 @@
         <h2 class="section-title">About SHA-512</h2>
         <div class="info-content">
             <div class="info-text">
-                <p>The Secure Hash Algorithm 512 (SHA-512) is a cryptographic hash function and a member of the SHA-2 family, designed by the United States National Security Agency (NSA). A hash function takes an input of any length and produces a fixed-size string of characters, which is the hash value.</p>
+                <p>The Secure Hash Algorithm 512 (SHA-512) is a cryptographic hash function and a member of the SHA-2 family, designed by the United States National Security Agency (NSA). A hash function takes an input of any length and produces a fixed-size string of characters, which is the hash value.</p><br>
                 <p>SHA-512 generates a 512-bit (64-byte) hash, typically rendered as a 128-character hexadecimal number. It is computationally infeasible to find two different messages that hash to the same value (collision resistance) or to find a message that produces a given hash (preimage resistance). This makes it ideal for verifying data integrity and hashing passwords.</p>
             </div>
             <div class="info-image">
-                <img src="https://i.stack.imgur.com/32G53.png" alt="SHA-512 Algorithm Structure">
+                <img src="https://drive.google.com/file/d/1wPQ1vCoqoJzRmkn9bxSySZS-bgMUtQ5n/view?usp=sharing" alt="SHA-512 Algorithm Structure">
             </div>
         </div>
     </section>
