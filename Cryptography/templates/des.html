@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}CipherPro | DES (Data Encryption Standard) Tool{% endblock %}
+{% block title %}DES | AlgoVault{% endblock %}
 
 {% block extra_head %}
     <link rel="stylesheet" href="{% static 'css/des.css' %}">
@@ -10,8 +10,8 @@
 {% block content %}
 <section class="hero" id="home">
     <div class="container">
-        <h1>DES (Data Encryption Standard) Tool</h1>
-        <p>A robust tool for encrypting and decrypting data using the DES algorithm, a foundational symmetric-key block cipher.</p>
+        <h1>DES (Data Encryption Standard)</h1>
+        <p>A robust tool for encrypting and decrypting data using the DES algorithm, a foundational symmetric-key block cipher. Experience the historic encryption standard that shaped modern cryptography with 64-bit blocks and 56-bit keys.</p>
     </div>
 </section>
 
@@ -101,11 +101,11 @@
         <h2 class="section-title">About DES</h2>
         <div class="info-content">
             <div class="info-text">
-                <p>The Data Encryption Standard (DES) is a symmetric-key block cipher developed by IBM in the 1970s and was adopted as a United States federal standard in 1977[3][8]. It works by encrypting data in 64-bit blocks using a 56-bit key[4].</p>
-                <p>The algorithm's core is a Feistel network which performs 16 rounds of complex operations, including permutations and substitutions, on each block of data[9]. For decryption, the same algorithm is used, but the round keys are applied in the reverse order[10]. Due to its relatively short key length, DES is now considered vulnerable to modern brute-force attacks and has largely been replaced by the Advanced Encryption Standard (AES)[5][10].</p>
+                <p>The Data Encryption Standard (DES) is a symmetric-key block cipher developed by IBM in the 1970s and was adopted as a United States federal standard in 1977. It works by encrypting data in 64-bit blocks using a 56-bit key.</p>
+                <br><p>The algorithm's core is a Feistel network which performs 16 rounds of complex operations, including permutations and substitutions, on each block of data. For decryption, the same algorithm is used, but the round keys are applied in the reverse order. Due to its relatively short key length, DES is now considered vulnerable to modern brute-force attacks and has largely been replaced by the Advanced Encryption Standard (AES).</p>
             </div>
             <div class="info-image">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Feistel_network.svg/330px-Feistel_network.svg.png" alt="DES Feistel Network Diagram">
+                <img src="https://media.geeksforgeeks.org/wp-content/uploads/20250416155622491215/DES-Encryption-Algorithm.webp" alt="DES Feistel Network Diagram">
             </div>
         </div>
     </section>
