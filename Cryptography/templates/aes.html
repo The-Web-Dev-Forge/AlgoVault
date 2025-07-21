@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}AES Encryption & Decryption Tool | CipherPro{% endblock %}
+{% block title %}AES | AlgoVault{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/aes.css' %}">
@@ -10,7 +10,7 @@
 {% block content %}
 <section class="hero" id="home">
     <div class="container">
-        <h1>AES  Solution</h1>
+        <h1>AES (Advanced Encryption Standard)</h1>
         <p>Secure your sensitive communications with military-grade AES (Advanced Encryption Standard). This tool provides detailed visualization of the encryption and decryption process.</p>
     </div>
 </section>
@@ -197,7 +197,7 @@
                 <p>Each round consists of several transformations: SubBytes, ShiftRows, MixColumns (skipped in the last round), and AddRoundKey. These operations, combined with a robust key schedule, ensure strong diffusion and confusion, making AES highly resistant to various cryptographic attacks.</p>
             </div>
             <div class="info-image">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/AES-SubBytes.svg/1200px-AES-SubBytes.svg.png" alt="AES SubBytes Operation" style="background: white; padding: 20px; border-radius: 8px;">
+                <img src="https://www.researchgate.net/publication/324796235/figure/fig1/AS:619919657926656@1524811772120/Block-diagram-for-AES-encryption-and-decryption.png" alt="AES SubBytes Operation" style="background: white; padding: 20px; border-radius: 8px;">
             </div>
         </div>
     </section>
@@ -214,9 +214,6 @@
                     <li><strong>View Visualization:</strong> Scroll down to the "Encryption/Decryption Visualization" section to see the detailed, step-by-step transformation of your data through each round of AES.</li>
                     <li><strong>Copy Results:</strong> Use the "Copy Result" buttons to easily copy the intermediate or final output to your clipboard.</li>
                 </ol>
-            </div>
-            <div class="info-image">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/AES_Encryption.svg/1024px-AES_Encryption.svg.png" alt="AES Workflow" style="background: white; padding: 20px; border-radius: 8px;">
             </div>
         </div>
     </section>
