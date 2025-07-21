@@ -19,6 +19,8 @@
 #sha512-block-info strong {
     color: var(--primary-color);
 }
+
+
 .static-blocks-container {
     display: flex;
     flex-wrap: wrap;
@@ -152,10 +154,6 @@
   opacity: 1;
 }
 
-.sha512-block-connector.active {
-  opacity: 1;
-}
-
 /* Detailed round view */
 .sha512-detail-view {
   background-color: #232323;
@@ -234,36 +232,6 @@
   word-break: break-all;
 }
 
-/* Controls */
-.sha512-controls {
-  display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.sha512-controls button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  background-color: var(--primary-color);
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s, opacity 0.2s;
-}
-
-.sha512-controls button:hover:not(:disabled) {
-  background-color: var(--primary-dark);
-}
-
-.sha512-controls button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.sha512-block-connector.active {
-  opacity: 1;
-}
-
 #result-section .result-box {
     font-size: 0.9rem;      /* Slightly smaller font for the long hash string */
     letter-spacing: 1px;   /* Add some space between characters */
@@ -286,7 +254,7 @@
     transform: rotate(360deg);
 }
 
-/* --- Animated Flow Visualization --- */
+/* --- SHA-512 Enhanced Animated Visualization --- */
 .sha512-visualization {
   margin-top: 40px;
   text-align: center;
@@ -294,7 +262,6 @@
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(255,0,0,0.08);
   padding: 32px 0 24px 0;
-  
 }
 
 .sha512-block-diagram-title {
@@ -376,13 +343,7 @@
 .sha512-hash { background: var(--result-bg); border: 1.5px solid var(--primary-color); border-radius: 10px; margin-top: 12px; padding: 8px 0; font-size: 1em; color: var(--result-text); font-family: 'Consolas', monospace; width: 100%; text-align: center; }
 
 /* --- Animation Controls --- */
-.sha512-controls { margin-top: 10px; }
-.sha512-controls button { margin: 0 8px; padding: 8px 24px; border-radius: 8px; border: none; background: var(--primary-color); color: #fff; font-weight: bold; cursor: pointer; transition: background-color 0.2s, transform 0.2s; }
-.sha512-controls button:hover:not(:disabled) { transform: translateY(-2px); background-color: #cc0000; }
-.sha512-controls button:disabled { background: var(--neutral-color); cursor: not-allowed; opacity: 0.6; }
-
-/* Controls */
-.sha512-controls {
+.sha512-controls { 
   display: flex;
   justify-content: center;
   gap: 0.75rem;
@@ -390,23 +351,25 @@
   margin-top: 10px;
 }
 
-.sha512-controls button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  background-color: var(--primary-color);
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.2s, opacity 0.2s, transform 0.2s;
-  margin: 0 4px;
+.sha512-controls button { 
+  margin: 0 8px; 
+  padding: 8px 24px; 
+  border-radius: 8px; 
+  border: none; 
+  background: var(--primary-color); 
+  color: #fff; 
+  font-weight: bold; 
+  cursor: pointer; 
+  transition: background-color 0.2s, transform 0.2s;
 }
 
-.sha512-controls button:hover:not(:disabled) {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
+.sha512-controls button:hover:not(:disabled) { 
+  transform: translateY(-2px); 
+  background-color: #cc0000; 
 }
 
-.sha512-controls button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.sha512-controls button:disabled { 
+  background: var(--neutral-color); 
+  cursor: not-allowed; 
+  opacity: 0.6; 
 }
