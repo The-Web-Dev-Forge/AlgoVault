@@ -29,6 +29,22 @@ def home(request):
     """Renders the home page."""
     return render(request, 'base.html', {'active_page': 'home'})
 
+def tools(request):
+    """Renders the tools page."""
+    return render(request, 'tools.html', {'active_page': 'tools'})
+
+def about(request):
+    """Renders the about page."""
+    return render(request, 'about.html', {'active_page': 'about'})
+
+def help_page(request):
+    """Renders the help page."""
+    return render(request, 'help.html', {'active_page': 'help'})
+
+def landing(request):
+    """Renders the landing page."""
+    return render(request, 'landing.html', {'active_page': 'landing'})
+
 def caesar_cipher(request):
     """Renders the Caesar Cipher tool page and processes encryption/decryption."""
     if request.method == 'POST':
