@@ -45,8 +45,12 @@
           
         <div class="btn-group">
             <button id="process-btn" class="btn">
-                <i class="fas fa-cogs" style="margin-right: 8px;"></i>
+                <i class="fas fa-cog" style="margin-right: 8px;"></i>
                 Generate & Exchange Keys
+            </button>
+            <button id="clear-btn" class="btn btn-secondary">
+                <i class="fas fa-trash" style="margin-right: 8px;"></i>
+                Clear
             </button>
             <button id="randomize-btn" class="btn btn-secondary">
                 <i class="fas fa-random" style="margin-right: 8px;"></i>
@@ -276,6 +280,10 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Set button to processing state
+        processBtn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>Processing...';
+        processBtn.disabled = true;
+
         const p = BigInt(primeInput.value);
         const g = BigInt(generatorInput.value);
         const a = BigInt(alicePrivateInput.value);
@@ -328,6 +336,10 @@ document.addEventListener('DOMContentLoaded', function() {
             resultSection.style.display = 'block';
             resultSection.scrollIntoView({ behavior: 'smooth' });
             showNotification('Shared secret successfully established!');
+            
+            // Reset button state
+            processBtn.innerHTML = '<i class="fas fa-cog" style="margin-right: 8px;"></i>Generate & Exchange Keys';
+            processBtn.disabled = false;
         }, delay += 1000);
     }
 
@@ -346,6 +358,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     processBtn.addEventListener('click', animateExchange);
     randomizeBtn.addEventListener('click', randomize);
+    
+    // Clear button functionality
+    const clearBtn = document.getElementById('clear-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            // Clear input fields
+            primeInput.value = '';
+            generatorInput.value = '';
+            alicePrivateInput.value = '';
+            bobPrivateInput.value = '';
+            
+            // Hide visualization and result sections
+            visualizationContainer.style.display = 'none';
+            resultSection.style.display = 'none';
+            
+            // Reset process button
+            processBtn.innerHTML = '<i class="fas fa-cog" style="margin-right: 8px;"></i>Generate & Exchange Keys';
+            processBtn.disabled = false;
+            
+            showNotification('Form cleared successfully!', 'success');
+        });
+    }
 });
 </script>
 {% endblock %}
