@@ -246,11 +246,11 @@
 }
 
 /* Style the icon for the hash generation button */
-#process-btn .btn-icon .fa-cog {
+#sha512-hash-btn .fa-cog {
     transition: transform 0.8s ease-in-out;
 }
 
-#process-btn:hover .btn-icon .fa-cog {
+#sha512-hash-btn:hover .fa-cog {
     transform: rotate(360deg);
 }
 
