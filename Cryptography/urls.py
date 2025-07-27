@@ -23,6 +23,8 @@ urlpatterns = [
     path('aes/', views.aes_view, name='aes'),
     path('md5/', views.md5_view, name='md5'),
     path('md5/process/', views.md5_process, name='md5_process'),
+    path('hmac/', views.hmac_view, name='hmac'),
+    path('hmac/process/', views.hmac_process, name='hmac_process'),
     path('diffie_hellman/', views.diffie_hellman_view, name='diffie_hellman'),
 
 ]
