@@ -46,9 +46,13 @@
             </div>
             
             <div class="btn-group">
-                <button type="submit" class="btn">
+                <button type="submit" id="process-btn" class="btn">
                     <span class="btn-text">Process </span>
                     <span class="btn-icon"><i class="fas fa-cog"></i></span>
+                </button>
+                <button type="button" id="clear-btn" class="btn btn-secondary">
+                    <span class="btn-text">Clear </span>
+                    <span class="btn-icon"><i class="fas fa-eraser"></i></span>
                 </button>
             </div>
         </form>
@@ -262,6 +266,34 @@ document.addEventListener('DOMContentLoaded', function() {
                     showNotification('Could not copy text: ' + err, 'error');
                 });
             }
+        });
+    }
+
+    // Add spinning icon on form submission
+    const form = document.querySelector('form');
+    const processBtn = document.getElementById('process-btn');
+    if (form && processBtn) {
+        form.addEventListener('submit', function(e) {
+            processBtn.innerHTML = '<span class="btn-text">Processing...</span><span class="btn-icon"><i class="fas fa-spinner fa-spin"></i></span>';
+            processBtn.disabled = true;
+        });
+    }
+
+    // Clear button functionality
+    const clearBtn = document.getElementById('clear-btn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            document.getElementById('message').value = '';
+            document.getElementById('key').value = '';
+            document.getElementById('operation').selectedIndex = 0;
+            
+            // Hide result section if visible
+            const resultSection = document.getElementById('result-section');
+            if (resultSection) {
+                resultSection.style.display = 'none';
+            }
+            
+            showNotification('Form cleared successfully!', 'success');
         });
     }
 });
