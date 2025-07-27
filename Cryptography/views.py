@@ -24,6 +24,7 @@ from SHA512.SHA512 import sha512_hash
 from AES.AES import aes_fallback
 from DiffieHellman.DiffieHellman import diffie_hellman_fallback
 from MD5.MD5 import MD5Hash
+from HMAC.HMAC import HMACHash, hmac_fallback
 
 def home(request):
     """Renders the home page."""
@@ -780,3 +781,248 @@ def diffie_hellman_process_api(request):
 
     except Exception as e:
         return JsonResponse({'error': f'Processing failed: {str(e)}'}, status=500)
+
+
+def hmac_view(request):
+    """Render the form page initially or with previous inputs/results"""
+    context = {
+        'input_text': '',
+        'secret_key': '',
+        'algorithm': 'sha256',
+        'output_format': 'hex',
+        'operation': 'generate',
+        'expected_hmac': '',
+        'result': None,
+    }
+    return render(request, 'hmac.html', context)
+
+
+def hmac_process(request):
+    """Process HMAC generation or verification with C++ primary implementation and detailed step visualization"""
+    if request.method == 'POST':
+        input_text = request.POST.get('input_text', '').strip()
+        secret_key = request.POST.get('secret_key', '').strip()
+        algorithm = request.POST.get('algorithm', 'sha256').strip()
+        output_format = request.POST.get('output_format', 'hex').strip()
+        operation = request.POST.get('operation', 'generate').strip()
+        expected_hmac = request.POST.get('expected_hmac', '').strip()
+
+        context = {
+            'input_text': input_text,
+            'secret_key': secret_key,
+            'algorithm': algorithm,
+            'output_format': output_format,
+            'operation': operation,
+            'expected_hmac': expected_hmac,
+            'result': None,
+            'implementation_used': None,
+            'steps': None,
+        }
+
+        if not input_text:
+            context['result'] = "Error: Message is required."
+            return render(request, 'hmac.html', context)
+
+        if not secret_key:
+            context['result'] = "Error: Secret key is required."
+            return render(request, 'hmac.html', context)
+
+        try:
+            # Try C++ implementation first (supports all algorithms: MD5, SHA1, SHA224, SHA256, SHA384, SHA512)
+            try:
+                exe_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 
+                                      'Algorithm', 'Crypto_Native', 'CPP', 'HMAC')
+                
+                if os.path.exists(exe_path):
+                    # Convert algorithm name to uppercase for C++ compatibility
+                    cpp_algorithm = algorithm.upper()
+                    
+                    if operation == 'verify':
+                        if not expected_hmac:
+                            context['result'] = "Error: Expected HMAC is required for verification."
+                            return render(request, 'hmac.html', context)
+                        
+                        # Run verification with algorithm parameter
+                        process = subprocess.run([exe_path, input_text, secret_key, expected_hmac, cpp_algorithm], 
+                                               capture_output=True, text=True, check=True)
+                        result_json = json.loads(process.stdout.strip())
+                        
+                        if result_json.get('valid', False):
+                            context['result'] = "✅ HMAC verification successful! The message is authentic."
+                        else:
+                            context['result'] = "❌ HMAC verification failed! The message may have been tampered with."
+                        
+                        context['implementation_used'] = 'C++ Native Implementation'
+                        
+                    else:
+                        # Generate HMAC with detailed steps and algorithm parameter
+                        process = subprocess.run([exe_path, input_text, secret_key, cpp_algorithm], 
+                                               capture_output=True, text=True, check=True)
+                        result_json = json.loads(process.stdout.strip())
+                        
+                        if result_json.get('success', False):
+                            hmac_value = result_json['hmac']
+                            
+                            # Format the output based on user preference
+                            if output_format == 'HEX':
+                                formatted_result = hmac_value.upper()
+                            elif output_format == 'base64':
+                                # Convert hex to base64
+                                hex_bytes = bytes.fromhex(hmac_value)
+                                formatted_result = base64.b64encode(hex_bytes).decode('ascii')
+                            else:  # hex (lowercase)
+                                formatted_result = hmac_value.lower()
+                            
+                            context['result'] = formatted_result
+                            context['implementation_used'] = 'C++ Native Implementation'
+                            
+                            # Prepare step-by-step visualization data
+                            steps = result_json.get('steps', {})
+                            context['steps'] = {
+                                'original_key': steps.get('originalKey', ''),
+                                'processed_key': steps.get('processedKey', ''),
+                                'key_analysis': steps.get('keyAnalysis', ''),
+                                'inner_pad': steps.get('innerPad', ''),
+                                'outer_pad': steps.get('outerPad', ''),
+                                'inner_key_material': steps.get('innerKeyMaterial', ''),
+                                'outer_key_material': steps.get('outerKeyMaterial', ''),
+                                'message_hex': steps.get('messageHex', ''),
+                                'inner_hash': steps.get('innerHash', ''),
+                                'outer_input': steps.get('outerInput', ''),
+                                'final_hmac': steps.get('finalHmac', ''),
+                                'block_size': steps.get('blockSize', 64),
+                                'algorithm': steps.get('algorithm', algorithm.upper())
+                            }
+                        else:
+                            raise subprocess.CalledProcessError(1, exe_path, result_json.get('error', 'Unknown error'))
+                    
+                    return render(request, 'hmac.html', context)
+                
+            except (subprocess.CalledProcessError, OSError, FileNotFoundError, json.JSONDecodeError) as e:
+                # Fall back to Python implementation
+                print(f"C++ HMAC failed, falling back to Python: {e}")
+                pass
+
+            # Python fallback implementation
+            try:
+                from Algorithm.Crypto_Fallback.Python.HMAC.HMAC import HMACHash
+                
+                if operation == 'verify':
+                    if not expected_hmac:
+                        context['result'] = "Error: Expected HMAC is required for verification."
+                        return render(request, 'hmac.html', context)
+                    
+                    generated_hmac, matches = HMACHash.verify_hmac(
+                        input_text, secret_key, expected_hmac, algorithm, output_format
+                    )
+                    
+                    if matches:
+                        context['result'] = f"✅ HMAC verification successful! The message is authentic.\nGenerated: {generated_hmac}"
+                    else:
+                        context['result'] = f"❌ HMAC verification failed! The message may have been tampered with.\nGenerated: {generated_hmac}\nExpected: {expected_hmac}"
+                    
+                    context['implementation_used'] = 'Python HMAC Library'
+                    
+                else:
+                    # Generate HMAC with Python implementation
+                    if algorithm == 'sha256':
+                        # Use our detailed implementation for step visualization
+                        hmac_result, step_details = hmac_fallback(input_text, secret_key)
+                        
+                        # Format the output based on user preference
+                        if output_format == 'HEX':
+                            context['result'] = hmac_result.upper()
+                        elif output_format == 'base64':
+                            hex_bytes = bytes.fromhex(hmac_result)
+                            context['result'] = base64.b64encode(hex_bytes).decode('ascii')
+                        else:  # hex (lowercase)
+                            context['result'] = hmac_result.lower()
+                        
+                        context['implementation_used'] = 'Python Custom Implementation'
+                        context['steps'] = step_details
+                    else:
+                        # Use standard library for other algorithms
+                        hmac_result = HMACHash.generate_hmac(input_text, secret_key, algorithm, output_format)
+                        context['result'] = hmac_result
+                        context['implementation_used'] = 'Python HMAC Library'
+                        
+            except ImportError:
+                # Final fallback to basic Python hmac library
+                try:
+                    import hmac
+                    import hashlib
+                    
+                    # Map algorithm names to hashlib functions
+                    hash_algorithms = {
+                        'md5': hashlib.md5,
+                        'sha1': hashlib.sha1,
+                        'sha224': hashlib.sha224,
+                        'sha256': hashlib.sha256,
+                        'sha384': hashlib.sha384,
+                        'sha512': hashlib.sha512
+                    }
+                    
+                    if algorithm not in hash_algorithms:
+                        context['result'] = f"Error: Unsupported algorithm: {algorithm}"
+                        return render(request, 'hmac.html', context)
+                    
+                    hash_func = hash_algorithms[algorithm]
+                    hmac_obj = hmac.new(
+                        secret_key.encode('utf-8'),
+                        input_text.encode('utf-8'),
+                        hash_func
+                    )
+                    
+                    if operation == 'verify':
+                        if not expected_hmac:
+                            context['result'] = "Error: Expected HMAC is required for verification."
+                            return render(request, 'hmac.html', context)
+                        
+                        # Format the generated HMAC based on output format
+                        if output_format == 'HEX':
+                            generated_hmac = hmac_obj.hexdigest().upper()
+                        elif output_format == 'base64':
+                            import base64
+                            generated_hmac = base64.b64encode(hmac_obj.digest()).decode('ascii')
+                        else:  # hex (lowercase)
+                            generated_hmac = hmac_obj.hexdigest().lower()
+                        
+                        # Compare HMACs (case-insensitive for hex)
+                        if output_format.lower() in ['hex']:
+                            matches = generated_hmac.lower() == expected_hmac.lower()
+                        else:
+                            matches = generated_hmac == expected_hmac
+                        
+                        if matches:
+                            context['result'] = f"✅ HMAC verification successful! The message is authentic.\nGenerated: {generated_hmac}"
+                        else:
+                            context['result'] = f"❌ HMAC verification failed! The message may have been tampered with.\nGenerated: {generated_hmac}\nExpected: {expected_hmac}"
+                    else:
+                        # Format the output based on user preference
+                        if output_format == 'HEX':
+                            context['result'] = hmac_obj.hexdigest().upper()
+                        elif output_format == 'base64':
+                            import base64
+                            context['result'] = base64.b64encode(hmac_obj.digest()).decode('ascii')
+                        else:  # hex (lowercase)
+                            context['result'] = hmac_obj.hexdigest().lower()
+                    
+                    context['implementation_used'] = 'Python Standard Library'
+                    
+                except Exception as e:
+                    context['result'] = f"Error generating HMAC: {str(e)}"
+                    context['implementation_used'] = 'Error'
+
+            except Exception as e:
+                context['result'] = f"Error generating HMAC: {str(e)}"
+                context['implementation_used'] = 'Error'
+
+        except Exception as e:
+            context['result'] = f"Error generating HMAC: {str(e)}"
+            context['implementation_used'] = 'Error'
+
+        return render(request, 'hmac.html', context)
+
+    else:
+        # If GET request, redirect to hmac_view
+        return hmac_view(request)
