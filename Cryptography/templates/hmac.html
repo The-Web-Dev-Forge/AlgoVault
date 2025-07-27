@@ -1,0 +1,1046 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}HMAC | AlgoVault{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/caesar.css' %}">
+<link rel="stylesheet" href="{% static 'css/hmac.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="hero" id="home">
+    <div class="container">
+        <h1>HMAC Generator</h1>
+        <p>Generate secure Hash-based Message Authentication Codes (HMAC) for message integrity and authenticity verification. Our enterprise-grade HMAC tool supports multiple hash algorithms and provides reliable authentication with comprehensive output format options.</p>
+    </div>
+</section>
+{% csrf_token %}
+<main class="main container" id="hmac-tool-section">
+    <div class="notification success" id="notification"></div>
+    <section class="cipher-section">
+        <h2 class="section-title">HMAC Generator</h2>
+
+        <div class="input-group">
+            <label for="message">Message</label>
+            <textarea id="message" placeholder="Enter message to authenticate...">{{ input_text|default_if_none:"" }}</textarea>
+        </div>
+
+        <div class="input-group">
+            <label for="key">Secret Key</label>
+            <input type="text" id="key" placeholder="Enter secret key..." value="{{ secret_key|default_if_none:"" }}">
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="algorithm">Hash Algorithm</label>
+                <select id="algorithm">
+                    <option value="sha256" {% if algorithm == "sha256" %}selected{% endif %}>SHA-256 (Recommended)</option>
+                    <option value="sha512" {% if algorithm == "sha512" %}selected{% endif %}>SHA-512</option>
+                    <option value="sha384" {% if algorithm == "sha384" %}selected{% endif %}>SHA-384</option>
+                    <option value="sha224" {% if algorithm == "sha224" %}selected{% endif %}>SHA-224</option>
+                    <option value="sha1" {% if algorithm == "sha1" %}selected{% endif %}>SHA-1</option>
+                    <option value="md5" {% if algorithm == "md5" %}selected{% endif %}>MD5 (Legacy)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="output-format">Output Format</label>
+                <select id="output-format">
+                    <option value="hex" {% if output_format == "hex" %}selected{% endif %}>Hexadecimal (lowercase)</option>
+                    <option value="HEX" {% if output_format == "HEX" %}selected{% endif %}>Hexadecimal (uppercase)</option>
+                    <option value="base64" {% if output_format == "base64" %}selected{% endif %}>Base64</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label for="operation">Operation</label>
+                <select id="operation">
+                    <option value="generate" {% if operation == "generate" %}selected{% endif %}>Generate HMAC</option>
+                    <option value="verify" {% if operation == "verify" %}selected{% endif %}>Verify HMAC</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="input-group" id="verify-hmac-section" style="display: none;">
+            <label for="expected-hmac">Expected HMAC (for verification)</label>
+            <input type="text" id="expected-hmac" placeholder="Enter expected HMAC..." value="{{ expected_hmac|default_if_none:"" }}">
+        </div>
+
+        <div class="btn-group">
+            <button id="process-btn" class="btn tooltip">
+                <span class="btn-text">Generate HMAC</span>
+                <span class="btn-icon"><i class="fas fa-cog"></i></span>
+                <span class="tooltiptext">Generate HMAC</span>
+            </button>
+            <button id="clear-btn" class="btn btn-secondary tooltip">
+                <span class="btn-text">Clear</span>
+                <span class="btn-icon"><i class="fas fa-eraser"></i></span>
+                <span class="tooltiptext">Reset all fields</span>
+            </button>
+        </div>
+
+        <div class="result-section" id="result-section"{% if result %} style="display:block;"{% else %} style="display:none;"{% endif %}>
+            <h3>Result</h3>
+            <div class="result-box" id="result-output">{% if result %}{{ result }}{% endif %}</div>
+            <button id="copy-btn" class="btn btn-accent copy-btn tooltip">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+                <span class="tooltiptext">Copy result to clipboard</span>
+            </button>
+        </div>
+
+        <div class="shift-visualization" id="hmac-visualization" style="display:none;">
+            <h3>HMAC Process Visualization</h3>
+            <p class="visualization-guide">Watch the step-by-step HMAC algorithm process</p>
+
+            <!-- Current Step Indicator -->
+            <div class="current-step-indicator" id="current-step-indicator">
+                <div class="step-progress">
+                    <div class="progress-dot active clickable" id="dot-1" onclick="navigateToStep(1)">1</div>
+                    <div class="progress-line" id="line-1"></div>
+                    <div class="progress-dot clickable" id="dot-2" onclick="navigateToStep(2)">2</div>
+                    <div class="progress-line" id="line-2"></div>
+                    <div class="progress-dot clickable" id="dot-3" onclick="navigateToStep(3)">3</div>
+                    <div class="progress-line" id="line-3"></div>
+                    <div class="progress-dot clickable" id="dot-4" onclick="navigateToStep(4)">4</div>
+                    <div class="progress-line" id="line-4"></div>
+                    <div class="progress-dot clickable" id="dot-5" onclick="navigateToStep(5)">5</div>
+                    <div class="progress-line" id="line-5"></div>
+                    <div class="progress-dot clickable" id="dot-6" onclick="navigateToStep(6)">6</div>
+                </div>
+                <div class="step-labels">
+                    <span class="step-label active clickable" id="label-1" onclick="navigateToStep(1)">Key Check</span>
+                    <span class="step-label clickable" id="label-2" onclick="navigateToStep(2)">Key Processing</span>
+                    <span class="step-label clickable" id="label-3" onclick="navigateToStep(3)">Inner Pad & XOR</span>
+                    <span class="step-label clickable" id="label-4" onclick="navigateToStep(4)">Inner Hash</span>
+                    <span class="step-label clickable" id="label-5" onclick="navigateToStep(5)">Outer Pad & XOR</span>
+                    <span class="step-label clickable" id="label-6" onclick="navigateToStep(6)">Final HMAC</span>
+                </div>
+            </div>
+
+            <!-- Step Navigation Controls -->
+            <div class="step-navigation" id="step-navigation" style="display: none;">
+                <button class="nav-btn" id="prev-step-btn" onclick="navigateToPreviousStep()">
+                    <i class="fas fa-chevron-left"></i> Previous Step
+                </button>
+                <span class="current-step-info" id="current-step-info">Step 1 of 6</span>
+                <button class="nav-btn" id="next-step-btn" onclick="navigateToNextStep()">
+                    Next Step <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Step 1: Key Length Check -->
+            <div class="hash-step active" id="step1">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <h4>Key Length Analysis</h4>
+                    <div class="step-status" id="step1-status">🔄 Processing</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-explanation">
+                        <p>The first step in HMAC is analyzing the secret key length against the hash function's block size. This determines whether the key needs to be hashed, padded, or can be used as-is.</p>
+                    </div>
+                    <div class="process-visual">
+                        <div class="input-display">
+                            <div class="input-label">Your Secret Key:</div>
+                            <div class="input-value" id="step1-key">Loading...</div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="process-box" id="step1-analysis">
+                            <div class="process-text">Analyzing key length vs block size...</div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="output-display">
+                            <div class="output-label">Decision:</div>
+                            <div class="output-value" id="step1-decision">Determining process...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Key Processing -->
+            <div class="hash-step" id="step2" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <h4>Key Preprocessing</h4>
+                    <div class="step-status" id="step2-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-explanation">
+                        <p>Based on the key length analysis, the key is either hashed (if too long) or zero-padded (if too short) to match the hash function's block size exactly.</p>
+                    </div>
+                    <div class="process-visual">
+                        <div class="transformation-box" id="step2-transform">
+                            <div class="transform-input">
+                                <div class="transform-label">Original Key:</div>
+                                <div class="transform-value" id="step2-original">Processing...</div>
+                            </div>
+                            <div class="transform-arrow">↓</div>
+                            <div class="transform-process" id="step2-process">
+                                <div class="process-text">Applying transformation...</div>
+                            </div>
+                            <div class="transform-arrow">↓</div>
+                            <div class="transform-output">
+                                <div class="transform-label">Processed Key (Block Size):</div>
+                                <div class="transform-value" id="step2-result">Ready for HMAC operations</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Inner Padding & XOR -->
+            <div class="hash-step" id="step3" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h4>Inner Padding (ipad) XOR</h4>
+                    <div class="step-status" id="step3-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-explanation">
+                        <p>Create the inner padding (ipad) by repeating 0x36 for the block size, then XOR it with the processed key to create the inner key material.</p>
+                    </div>
+                    <div class="process-visual">
+                        <div class="padding-creation" id="step3-padding">
+                            <div class="padding-item">
+                                <div class="padding-label">Inner Padding (ipad):</div>
+                                <div class="padding-value">0x36363636... (repeated to block size)</div>
+                            </div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="xor-operation">
+                            <div class="xor-item">
+                                <div class="operand-label">Processed Key:</div>
+                                <div class="operand" id="step3-key">Key material</div>
+                            </div>
+                            <div class="xor-symbol">⊕</div>
+                            <div class="xor-item">
+                                <div class="operand-label">Inner Pad:</div>
+                                <div class="operand">0x36363636...</div>
+                            </div>
+                            <div class="equals">=</div>
+                            <div class="xor-result" id="step3-result">Computing XOR...</div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="output-display">
+                            <div class="output-label">Inner Key Material:</div>
+                            <div class="output-value" id="step3-inner-key">Ready for message concatenation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Inner Hash Computation -->
+            <div class="hash-step" id="step4" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <h4>Inner Hash Computation</h4>
+                    <div class="step-status" id="step4-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-explanation">
+                        <p>Concatenate the inner key material with the original message, then compute the hash of this combined data to produce the inner hash result.</p>
+                    </div>
+                    <div class="process-visual">
+                        <div class="concatenation">
+                            <div class="concat-item">
+                                <div class="concat-label">Inner Key Material:</div>
+                                <div class="concat-part" id="step4-inner-key">(Key ⊕ ipad)</div>
+                            </div>
+                            <div class="concat-symbol">||</div>
+                            <div class="concat-item">
+                                <div class="concat-label">Your Message:</div>
+                                <div class="concat-part" id="step4-message">Message content</div>
+                            </div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="hash-computation">
+                            <div class="hash-box" id="step4-hash-box">
+                                <div class="hash-label" id="step4-algorithm">SHA-256</div>
+                                <div class="hash-spinner" id="step4-spinner"></div>
+                                <div class="hash-text">Computing inner hash...</div>
+                            </div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="hash-output">
+                            <div class="output-label">Inner Hash Result:</div>
+                            <div class="output-value" id="step4-result">Processing...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Outer Padding & XOR -->
+            <div class="hash-step" id="step5" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">5</div>
+                    <h4>Outer Padding (opad) XOR</h4>
+                    <div class="step-status" id="step5-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-explanation">
+                        <p>Create the outer padding (opad) by repeating 0x5C for the block size, then XOR it with the processed key to create the outer key material.</p>
+                    </div>
+                    <div class="process-visual">
+                        <div class="padding-creation" id="step5-padding">
+                            <div class="padding-item">
+                                <div class="padding-label">Outer Padding (opad):</div>
+                                <div class="padding-value">0x5C5C5C5C... (repeated to block size)</div>
+                            </div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="xor-operation">
+                            <div class="xor-item">
+                                <div class="operand-label">Processed Key:</div>
+                                <div class="operand" id="step5-key">Key material</div>
+                            </div>
+                            <div class="xor-symbol">⊕</div>
+                            <div class="xor-item">
+                                <div class="operand-label">Outer Pad:</div>
+                                <div class="operand">0x5C5C5C5C...</div>
+                            </div>
+                            <div class="equals">=</div>
+                            <div class="xor-result" id="step5-result">Computing XOR...</div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="output-display">
+                            <div class="output-label">Outer Key Material:</div>
+                            <div class="output-value" id="step5-outer-key">Ready for inner hash concatenation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 6: Final HMAC Computation -->
+            <div class="hash-step" id="step6" style="display: none;">
+                <div class="step-header">
+                    <div class="step-number">6</div>
+                    <h4>Final HMAC Generation</h4>
+                    <div class="step-status" id="step6-status">⏳ Waiting</div>
+                </div>
+                <div class="step-content">
+                    <div class="step-explanation">
+                        <p>Concatenate the outer key material with the inner hash result, then compute the final hash to produce the complete HMAC authentication code.</p>
+                    </div>
+                    <div class="process-visual">
+                        <div class="concatenation">
+                            <div class="concat-item">
+                                <div class="concat-label">Outer Key Material:</div>
+                                <div class="concat-part" id="step6-outer-key">(Key ⊕ opad)</div>
+                            </div>
+                            <div class="concat-symbol">||</div>
+                            <div class="concat-item">
+                                <div class="concat-label">Inner Hash:</div>
+                                <div class="concat-part" id="step6-inner-hash">Inner hash result</div>
+                            </div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="hash-computation">
+                            <div class="hash-box" id="step6-hash-box">
+                                <div class="hash-label" id="step6-algorithm">SHA-256</div>
+                                <div class="hash-spinner" id="step6-spinner"></div>
+                                <div class="hash-text">Computing final HMAC...</div>
+                            </div>
+                        </div>
+                        <div class="arrow-down">↓</div>
+                        <div class="final-result" id="step6-final-result">
+                            <div class="result-header"> HMAC Generated Successfully!</div>
+                            <div class="result-value" id="step6-hmac">Your complete HMAC authentication code</div>
+                            <div class="formula">HMAC = Hash((K ⊕ opad) || Hash((K ⊕ ipad) || message))</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Cards for HMAC -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3 class="feature-title">Message Authentication</h3>
+            <p>Generate cryptographic authentication codes to verify message authenticity and integrity using secret keys.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-key"></i>
+            </div>
+            <h3 class="feature-title">Secret Key Based</h3>
+            <p>Uses shared secret keys for authentication, providing security against forgery attacks and unauthorized access.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 class="feature-title">HMAC Verification</h3>
+            <p>Verify message authenticity by comparing generated HMACs with expected values to detect tampering.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-eye"></i>
+            </div>
+            <h3 class="feature-title">Process Visualization</h3>
+            <p>Understand the step-by-step HMAC algorithm with an interactive visualizer showing key processing and hashing.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <h3 class="feature-title">Multiple Algorithms</h3>
+            <p>Support for various hash functions including SHA-256, SHA-512, SHA-384, SHA-224, SHA-1, and MD5.</p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-code"></i>
+            </div>
+            <h3 class="feature-title">Developer Friendly</h3>
+            <p>Built with clear, modular code, making it easy to integrate and extend for developers and security applications.</p>
+        </div>
+    </div>
+    
+    <!-- Info Sections for HMAC -->
+    <section class="info-section" id="about">
+        <h2 class="section-title">About HMAC</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <p>HMAC (Hash-based Message Authentication Code) is a specific type of message authentication code involving a cryptographic hash function in combination with a secret cryptographic key. It was defined in RFC 2104 and provides both data integrity and authentication.</p><br>
+                <p>HMAC can be used with any cryptographic hash function (MD5, SHA-1, SHA-256, etc.) in combination with a secret shared key. The cryptographic strength of HMAC depends upon the cryptographic strength of the underlying hash function, the size of its hash output, and the size and quality of the key.</p><br>
+                <p>The HMAC construction is resistant to extension attacks and provides strong security guarantees. It's widely used in internet protocols including TLS, IPsec, SSH, and many others for ensuring message authenticity and integrity.</p>
+            </div>
+            <div class="info-image">
+                <img src="https://www.researchgate.net/profile/M-Akif-Oezkan/publication/305956412/figure/fig1/AS:392465245851648@1470582414023/HMAC-SHA1-Construction.png" alt="HMAC Algorithm Diagram">
+            </div>
+        </div>
+    </section>
+    
+    <section class="info-section" id="help">
+        <h2 class="section-title">How to Use</h2>
+        <div class="info-content">
+            <div class="info-text">
+                <ol>
+                    <li><strong>Enter Message:</strong> Type or paste the message you want to authenticate into the message field.</li>
+                    <li><strong>Enter Secret Key:</strong> Provide the secret key shared between sender and receiver.</li>
+                    <li><strong>Select Hash Algorithm:</strong> Choose the underlying hash function (SHA-256 recommended for security).</li>
+                    <li><strong>Select Output Format:</strong> Choose the desired format for the HMAC (Hexadecimal lowercase, uppercase, or Base64).</li>
+                    <li><strong>Select Operation:</strong> Choose to 'Generate HMAC' or 'Verify HMAC'. For verification, enter the expected HMAC value.</li>
+                    <li><strong>Process:</strong> Click the "Generate HMAC" or "Verify HMAC" button to perform the selected operation.</li>
+                    <li><strong>View Result:</strong> The result will appear in the result box below. You can copy it to your clipboard.</li>
+                </ol>
+                <br>
+                <p><strong>Note:</strong> The visualization section shows the internal steps of the HMAC algorithm as you generate an authentication code.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+// HMAC Tool JavaScript functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const messageInput = document.getElementById('message');
+    const keyInput = document.getElementById('key');
+    const algorithmSelect = document.getElementById('algorithm');
+    const outputFormatSelect = document.getElementById('output-format');
+    const operationSelect = document.getElementById('operation');
+    const expectedHmacInput = document.getElementById('expected-hmac');
+    const verifySection = document.getElementById('verify-hmac-section');
+    const processBtn = document.getElementById('process-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const copyBtn = document.getElementById('copy-btn');
+    const resultSection = document.getElementById('result-section');
+    const resultOutput = document.getElementById('result-output');
+    const hmacVisualization = document.getElementById('hmac-visualization');
+    const notification = document.getElementById('notification');
+
+    // Show/hide verification section based on operation
+    operationSelect.addEventListener('change', function() {
+        const operation = this.value;
+        if (operation === 'verify') {
+            verifySection.style.display = 'block';
+            processBtn.innerHTML = '<span class="btn-text">Verify HMAC</span><span class="btn-icon"><i class="fas fa-cog"></i></span><span class="tooltiptext">Verify HMAC</span>';
+        } else {
+            verifySection.style.display = 'none';
+            processBtn.innerHTML = '<span class="btn-text">Generate HMAC</span><span class="btn-icon"><i class="fas fa-cog"></i></span><span class="tooltiptext">Generate HMAC</span>';
+        }
+    });
+
+    // Process HMAC
+    processBtn.addEventListener('click', function() {
+        const message = messageInput.value.trim();
+        const key = keyInput.value.trim();
+        const algorithm = algorithmSelect.value;
+        const outputFormat = outputFormatSelect.value;
+        const operation = operationSelect.value;
+        const expectedHmac = expectedHmacInput.value.trim();
+
+        if (!message) {
+            showNotification('Please enter a message to authenticate.', 'error');
+            return;
+        }
+
+        if (!key) {
+            showNotification('Please enter a secret key.', 'error');
+            return;
+        }
+
+        if (operation === 'verify' && !expectedHmac) {
+            showNotification('Please enter the expected HMAC for verification.', 'error');
+            return;
+        }
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('input_text', message);
+        formData.append('secret_key', key);
+        formData.append('algorithm', algorithm);
+        formData.append('output_format', outputFormat);
+        formData.append('operation', operation);
+        formData.append('expected_hmac', expectedHmac);
+        formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+        // Show loading state
+        processBtn.disabled = true;
+        processBtn.innerHTML = '<span class="btn-text">Processing...</span><span class="btn-icon"><i class="fas fa-spinner fa-spin"></i></span>';
+
+        // Send request
+        fetch('{% url "hmac_process" %}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(html => {
+            // Parse the response to extract the result
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newResultOutput = doc.getElementById('result-output');
+            
+            if (newResultOutput && newResultOutput.textContent.trim()) {
+                resultOutput.innerHTML = newResultOutput.innerHTML;
+                resultSection.style.display = 'block';
+                
+                // Show visualization if enabled
+                if (operation === 'generate') {
+                    showHMACVisualization(message, key, algorithm);
+                }
+                
+                showNotification('HMAC processed successfully!', 'success');
+            } else {
+                showNotification('Error processing HMAC. Please try again.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Network error. Please try again.', 'error');
+        })
+        .finally(() => {
+            // Reset button state
+            processBtn.disabled = false;
+            const operation = operationSelect.value;
+            const buttonText = operation === 'verify' ? 'Verify HMAC' : 'Generate HMAC';
+            processBtn.innerHTML = `<span class="btn-text">${buttonText}</span><span class="btn-icon"><i class="fas fa-cog"></i></span><span class="tooltiptext">${buttonText}</span>`;
+        });
+    });
+
+    // Clear button
+    clearBtn.addEventListener('click', function() {
+        messageInput.value = '';
+        keyInput.value = '';
+        expectedHmacInput.value = '';
+        algorithmSelect.selectedIndex = 0;
+        outputFormatSelect.selectedIndex = 0;
+        operationSelect.selectedIndex = 0;
+        resultSection.style.display = 'none';
+        hmacVisualization.style.display = 'none';
+        verifySection.style.display = 'none';
+        processBtn.innerHTML = '<span class="btn-text">Generate HMAC</span><span class="btn-icon"><i class="fas fa-cog"></i></span><span class="tooltiptext">Generate HMAC</span>';
+        showNotification('Fields cleared!', 'success');
+    });
+
+    // Copy to clipboard
+    copyBtn.addEventListener('click', function() {
+        const text = resultOutput.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            showNotification('Result copied to clipboard!', 'success');
+        }).catch(() => {
+            showNotification('Failed to copy to clipboard.', 'error');
+        });
+    });
+
+    // Show notification
+    function showNotification(message, type) {
+        notification.textContent = message;
+        notification.className = `notification ${type}`;
+        notification.style.display = 'block';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 3000);
+    }
+
+    // HMAC Visualization
+    let currentStepNumber = 1;
+    let maxCompletedStep = 1;
+    let stepData = {
+        key: '',
+        message: '',
+        algorithm: ''
+    };
+
+    function showHMACVisualization(message, key, algorithm) {
+        hmacVisualization.style.display = 'block';
+        
+        // Store step data for navigation
+        stepData = { key, message, algorithm };
+        
+        // Reset visualization
+        resetVisualization();
+        
+        // Show navigation controls
+        document.getElementById('step-navigation').style.display = 'flex';
+        
+        // Start step-by-step process
+        executeStep1(key, algorithm, message);
+    }
+
+    function navigateToStep(stepNumber) {
+        console.log(`Navigating to step ${stepNumber}, maxCompletedStep: ${maxCompletedStep}`);
+        if (stepNumber <= maxCompletedStep) {
+            currentStepNumber = stepNumber;
+            showStep(stepNumber);
+            updateNavigationButtons();
+        } else {
+            console.log(`Cannot navigate to step ${stepNumber} - not completed yet`);
+        }
+    }
+
+    function navigateToPreviousStep() {
+        if (currentStepNumber > 1) {
+            navigateToStep(currentStepNumber - 1);
+        }
+    }
+
+    function navigateToNextStep() {
+        if (currentStepNumber < maxCompletedStep) {
+            navigateToStep(currentStepNumber + 1);
+        }
+    }
+
+    // Make functions globally accessible for onclick handlers
+    window.navigateToStep = navigateToStep;
+    window.navigateToPreviousStep = navigateToPreviousStep;
+    window.navigateToNextStep = navigateToNextStep;
+
+    function showStep(stepNumber) {
+        // Hide all steps
+        document.querySelectorAll('.hash-step').forEach(step => {
+            step.style.display = 'none';
+            step.classList.remove('active');
+        });
+        
+        // Show selected step
+        const step = document.getElementById(`step${stepNumber}`);
+        step.style.display = 'block';
+        step.classList.add('active');
+        
+        // Update progress indicators to highlight current step
+        updateStepProgressForNavigation(stepNumber);
+        updateNavigationInfo();
+    }
+
+    function updateStepProgressForNavigation(stepNumber) {
+        // Reset all progress indicators
+        document.querySelectorAll('.progress-dot').forEach(dot => {
+            dot.classList.remove('active', 'completed');
+        });
+        document.querySelectorAll('.step-label').forEach(label => {
+            label.classList.remove('active');
+        });
+        document.querySelectorAll('.progress-line').forEach(line => {
+            line.classList.remove('active');
+        });
+        
+        // Set completed steps
+        for (let i = 1; i < stepNumber; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            const line = document.getElementById(`line-${i}`);
+            
+            dot.classList.add('completed');
+            if (line) line.classList.add('active');
+        }
+        
+        // Set current active step
+        const currentDot = document.getElementById(`dot-${stepNumber}`);
+        const currentLabel = document.getElementById(`label-${stepNumber}`);
+        
+        currentDot.classList.add('active');
+        currentLabel.classList.add('active');
+        
+        // Set completed steps beyond current if they exist
+        for (let i = stepNumber + 1; i <= maxCompletedStep; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            dot.classList.add('completed');
+        }
+    }
+
+    function updateNavigationButtons() {
+        const prevBtn = document.getElementById('prev-step-btn');
+        const nextBtn = document.getElementById('next-step-btn');
+        
+        prevBtn.disabled = currentStepNumber <= 1;
+        nextBtn.disabled = currentStepNumber >= maxCompletedStep;
+        
+        prevBtn.style.opacity = currentStepNumber <= 1 ? '0.5' : '1';
+        nextBtn.style.opacity = currentStepNumber >= maxCompletedStep ? '0.5' : '1';
+    }
+
+    function updateNavigationInfo() {
+        const currentStepInfo = document.getElementById('current-step-info');
+        const stepNames = ['Key Check', 'Key Processing', 'Inner Pad & XOR', 'Inner Hash', 'Outer Pad & XOR', 'Final HMAC'];
+        currentStepInfo.textContent = `Step ${currentStepNumber} of 6: ${stepNames[currentStepNumber - 1]}`;
+    }
+
+    function resetVisualization() {
+        // Reset step tracking
+        currentStepNumber = 1;
+        maxCompletedStep = 1;
+        
+        // Hide navigation initially
+        document.getElementById('step-navigation').style.display = 'none';
+        
+        // Hide all steps except first
+        document.querySelectorAll('.hash-step').forEach((step, index) => {
+            if (index === 0) {
+                step.classList.add('active');
+            } else {
+                step.classList.remove('active');
+                step.style.display = 'none';
+            }
+        });
+        
+        // Reset progress indicators
+        document.querySelectorAll('.progress-dot').forEach(dot => dot.classList.remove('active', 'completed'));
+        document.querySelectorAll('.progress-line').forEach(line => line.classList.remove('active'));
+        document.querySelectorAll('.step-label').forEach(label => label.classList.remove('active'));
+        
+        // Activate first step
+        document.getElementById('dot-1').classList.add('active');
+        document.getElementById('label-1').classList.add('active');
+        
+        // Remove completion message if exists
+        const existingCompletion = document.getElementById('completion-message');
+        if (existingCompletion) {
+            existingCompletion.remove();
+        }
+    }
+
+    function updateStepProgress(stepNumber) {
+        // Update progress indicators for sequential flow
+        for (let i = 1; i <= 6; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            const label = document.getElementById(`label-${i}`);
+            const line = document.getElementById(`line-${i}`);
+            
+            // Remove all classes first
+            dot.classList.remove('active', 'completed');
+            label.classList.remove('active', 'completed');
+            if (line) line.classList.remove('active');
+            
+            if (i < stepNumber) {
+                dot.classList.add('completed');
+                label.classList.add('completed');
+                if (line) line.classList.add('active');
+            } else if (i === stepNumber) {
+                dot.classList.add('active');
+                label.classList.add('active');
+            }
+        }
+    }
+
+    // Step 1: Key Length Analysis
+    function executeStep1(key, algorithm, message) {
+        currentStepNumber = 1;
+        maxCompletedStep = Math.max(maxCompletedStep, 1);
+        updateNavigationButtons();
+        
+        const status = document.getElementById('step1-status');
+        const keyDisplay = document.getElementById('step1-key');
+        const analysis = document.getElementById('step1-analysis');
+        const decision = document.getElementById('step1-decision');
+        
+        status.textContent = '🔄 Processing';
+        status.className = 'step-status processing';
+        
+        keyDisplay.textContent = key.length > 40 ? key.substring(0, 40) + '...' : key;
+        
+        const blockSize = algorithm.includes('512') || algorithm.includes('384') ? 128 : 64;
+        const keyLength = key.length;
+        
+        setTimeout(() => {
+            analysis.innerHTML = `<div class="process-text">Key length: ${keyLength} bytes | Block size: ${blockSize} bytes</div>`;
+        }, 1000);
+        
+        setTimeout(() => {
+            let decisionText = '';
+            if (keyLength > blockSize) {
+                decisionText = `Key too long → Hash key to ${blockSize} bytes`;
+            } else if (keyLength < blockSize) {
+                decisionText = `Key too short → Pad with zeros to ${blockSize} bytes`;
+            } else {
+                decisionText = `Key perfect → Use as-is (${blockSize} bytes)`;
+            }
+            
+            decision.textContent = decisionText;
+            status.textContent = '✅ Complete';
+            status.className = 'step-status complete';
+            
+            setTimeout(() => executeStep2(key, algorithm, message), 1500);
+        }, 2500);
+    }
+
+    // Step 2: Key Processing
+    function executeStep2(key, algorithm, message) {
+        currentStepNumber = 2;
+        maxCompletedStep = Math.max(maxCompletedStep, 2);
+        updateNavigationButtons();
+        
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+        document.getElementById('step2').classList.add('active');
+        updateStepProgress(2);
+        
+        const status = document.getElementById('step2-status');
+        const original = document.getElementById('step2-original');
+        const process = document.getElementById('step2-process');
+        const result = document.getElementById('step2-result');
+        
+        status.textContent = '🔄 Processing';
+        status.className = 'step-status processing';
+        
+        original.textContent = key.length > 30 ? key.substring(0, 30) + '...' : key;
+        
+        const blockSize = algorithm.includes('512') || algorithm.includes('384') ? 128 : 64;
+        const keyLength = key.length;
+        
+        setTimeout(() => {
+            if (keyLength > blockSize) {
+                process.innerHTML = `<div class="process-text">Hashing key: ${algorithm.toUpperCase()}(key) → ${blockSize} bytes</div>`;
+            } else if (keyLength < blockSize) {
+                process.innerHTML = `<div class="process-text">Zero-padding: key + (${blockSize - keyLength} × 0x00)</div>`;
+            } else {
+                process.innerHTML = `<div class="process-text">No transformation needed - key is exactly ${blockSize} bytes</div>`;
+            }
+        }, 1000);
+        
+        setTimeout(() => {
+            result.textContent = `Block-sized key ready (${blockSize} bytes)`;
+            status.textContent = '✅ Complete';
+            status.className = 'step-status complete';
+            
+            setTimeout(() => executeStep3(key, algorithm, message), 1500);
+        }, 2500);
+    }
+
+    // Step 3: Inner Padding & XOR
+    function executeStep3(key, algorithm, message) {
+        currentStepNumber = 3;
+        maxCompletedStep = Math.max(maxCompletedStep, 3);
+        updateNavigationButtons();
+        
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'block';
+        document.getElementById('step3').classList.add('active');
+        updateStepProgress(3);
+        
+        const status = document.getElementById('step3-status');
+        const keyDisplay = document.getElementById('step3-key');
+        const result = document.getElementById('step3-result');
+        const innerKey = document.getElementById('step3-inner-key');
+        
+        status.textContent = '🔄 Processing';
+        status.className = 'step-status processing';
+        
+        keyDisplay.textContent = 'Processed key material';
+        
+        setTimeout(() => {
+            result.textContent = 'Key ⊕ 0x36363636...';
+            result.classList.add('animate-highlight');
+        }, 1000);
+        
+        setTimeout(() => {
+            innerKey.textContent = 'Inner key material created successfully';
+            status.textContent = '✅ Complete';
+            status.className = 'step-status complete';
+            
+            setTimeout(() => executeStep4(key, algorithm, message), 1500);
+        }, 2500);
+    }
+
+    // Step 4: Inner Hash Computation
+    function executeStep4(key, algorithm, message) {
+        currentStepNumber = 4;
+        maxCompletedStep = Math.max(maxCompletedStep, 4);
+        updateNavigationButtons();
+        
+        document.getElementById('step3').style.display = 'none';
+        document.getElementById('step4').style.display = 'block';
+        document.getElementById('step4').classList.add('active');
+        updateStepProgress(4);
+        
+        const status = document.getElementById('step4-status');
+        const innerKeyDisplay = document.getElementById('step4-inner-key');
+        const messageDisplay = document.getElementById('step4-message');
+        const algorithm4 = document.getElementById('step4-algorithm');
+        const spinner = document.getElementById('step4-spinner');
+        const result = document.getElementById('step4-result');
+        
+        status.textContent = '🔄 Processing';
+        status.className = 'step-status processing';
+        
+        innerKeyDisplay.textContent = '(Key ⊕ ipad)';
+        messageDisplay.textContent = message.length > 25 ? message.substring(0, 25) + '...' : message;
+        algorithm4.textContent = algorithm.toUpperCase();
+        
+        setTimeout(() => {
+            spinner.classList.add('spinning');
+        }, 1000);
+        
+        setTimeout(() => {
+            spinner.classList.remove('spinning');
+            result.textContent = 'Inner hash computed successfully';
+            result.classList.add('success-text');
+            status.textContent = '✅ Complete';
+            status.className = 'step-status complete';
+            
+            setTimeout(() => executeStep5(key, algorithm, message), 1500);
+        }, 3500);
+    }
+
+    // Step 5: Outer Padding & XOR
+    function executeStep5(key, algorithm, message) {
+        currentStepNumber = 5;
+        maxCompletedStep = Math.max(maxCompletedStep, 5);
+        updateNavigationButtons();
+        
+        document.getElementById('step4').style.display = 'none';
+        document.getElementById('step5').style.display = 'block';
+        document.getElementById('step5').classList.add('active');
+        updateStepProgress(5);
+        
+        const status = document.getElementById('step5-status');
+        const keyDisplay = document.getElementById('step5-key');
+        const result = document.getElementById('step5-result');
+        const outerKey = document.getElementById('step5-outer-key');
+        
+        status.textContent = '🔄 Processing';
+        status.className = 'step-status processing';
+        
+        keyDisplay.textContent = 'Processed key material';
+        
+        setTimeout(() => {
+            result.textContent = 'Key ⊕ 0x5C5C5C5C...';
+            result.classList.add('animate-highlight');
+        }, 1000);
+        
+        setTimeout(() => {
+            outerKey.textContent = 'Outer key material created successfully';
+            status.textContent = '✅ Complete';
+            status.className = 'step-status complete';
+            
+            setTimeout(() => executeStep6(key, algorithm, message), 1500);
+        }, 2500);
+    }
+
+    // Step 6: Final HMAC Generation
+    function executeStep6(key, algorithm, message) {
+        currentStepNumber = 6;
+        maxCompletedStep = Math.max(maxCompletedStep, 6);
+        updateNavigationButtons();
+        
+        document.getElementById('step5').style.display = 'none';
+        document.getElementById('step6').style.display = 'block';
+        document.getElementById('step6').classList.add('active');
+        updateStepProgress(6);
+        
+        const status = document.getElementById('step6-status');
+        const outerKeyDisplay = document.getElementById('step6-outer-key');
+        const innerHashDisplay = document.getElementById('step6-inner-hash');
+        const algorithm6 = document.getElementById('step6-algorithm');
+        const spinner = document.getElementById('step6-spinner');
+        const hmacResult = document.getElementById('step6-hmac');
+        
+        status.textContent = '🔄 Processing';
+        status.className = 'step-status processing';
+        
+        outerKeyDisplay.textContent = '(Key ⊕ opad)';
+        innerHashDisplay.textContent = 'Inner hash result';
+        algorithm6.textContent = algorithm.toUpperCase();
+        
+        setTimeout(() => {
+            spinner.classList.add('spinning');
+        }, 1000);
+        
+        setTimeout(() => {
+            spinner.classList.remove('spinning');
+            hmacResult.innerHTML = `
+                <div class="success-text">HMAC successfully generated using ${algorithm.toUpperCase()}!</div>
+                <div class="hmac-summary">Complete RFC 2104 compliant authentication code</div>
+            `;
+            
+            status.textContent = '✅ Complete';
+            status.className = 'step-status complete';
+            
+            document.getElementById('step6-final-result').classList.add('final-celebration');
+            
+            setTimeout(() => showCompletionMessage(), 1500);
+        }, 3500);
+    }
+
+    function showCompletionMessage() {
+        // Add a completion summary
+        const hmacVisualization = document.getElementById('hmac-visualization');
+        
+        // Check if completion message already exists
+        if (!document.getElementById('completion-message')) {
+            const completionDiv = document.createElement('div');
+            completionDiv.id = 'completion-message';
+            completionDiv.className = 'completion-message';
+            completionDiv.innerHTML = `
+                <div class="completion-content">
+                    <h4>✅ HMAC Process Complete!</h4>
+                    <p>Your message has been successfully authenticated using the complete HMAC algorithm process. The detailed process involved:</p>
+                    <ul>
+                        <li><strong>Key Length Analysis:</strong> Analyzed your secret key against the hash function's block size</li>
+                        <li><strong>Key Preprocessing:</strong> Prepared the key to exact block size through hashing or padding</li>
+                        <li><strong>Inner Padding & XOR:</strong> Created inner key material using ipad (0x36) XOR operation</li>
+                        <li><strong>Inner Hash Computation:</strong> Combined inner key material with message and computed hash</li>
+                        <li><strong>Outer Padding & XOR:</strong> Created outer key material using opad (0x5C) XOR operation</li>
+                        <li><strong>Final HMAC Generation:</strong> Combined outer key material with inner hash for final result</li>
+                    </ul>
+                    <p>This RFC 2104 compliant process ensures maximum security and provides cryptographic proof of message authenticity and integrity through a double-hash construction.</p>
+                </div>
+            `;
+            
+            hmacVisualization.appendChild(completionDiv);
+            
+            // Animate the completion message
+            setTimeout(() => {
+                completionDiv.classList.add('show');
+            }, 100);
+        }
+    }
+
+    // Initialize the form based on current values
+    if (operationSelect.value === 'verify') {
+        verifySection.style.display = 'block';
+        processBtn.querySelector('.btn-text').textContent = 'Verify HMAC';
+    }
+});
+</script>
+{% endblock %}
