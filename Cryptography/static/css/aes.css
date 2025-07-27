@@ -196,6 +196,15 @@ textarea:focus, input[type="text"]:focus, select:focus {
     font-size: 0.8rem;
 }
 
+/* Rotating gear effect for process button */
+#process-btn .btn-icon .fa-cog {
+    transition: transform 0.8s ease-in-out;
+}
+
+#process-btn:hover .btn-icon .fa-cog {
+    transform: rotate(360deg);
+}
+
 /* Responsive design for final result */
 @media (max-width: 768px) {
     .final-result-section {
