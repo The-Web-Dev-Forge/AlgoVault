@@ -1,0 +1,17 @@
+/* Small circle that follows the mouse pointer */
+#mouse-follower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 14px;
+    height: 14px;
+    background: #9d7777; /* solid grey */
+    border-radius: 50%;
+    border: none;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: background 0.2s, box-shadow 0.2s, width 0.2s, height 0.2s;
+    box-shadow: 0 4px 16px 0 rgba(60,60,60,0.10);
+    filter: blur(0.5px);
+}
