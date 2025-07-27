@@ -343,6 +343,15 @@ textarea, input[type="text"], select {
     margin-right: 10px;
 }
 
+/* Rotating gear effect for process button */
+#process-btn .btn-icon .fa-cog {
+    transition: transform 0.8s ease-in-out;
+}
+
+#process-btn:hover .btn-icon .fa-cog {
+    transform: rotate(360deg);
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .input-row {
