@@ -10,9 +10,11 @@
     <link rel="stylesheet" href="{% static 'css/caesar.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="{% static 'css/mouse-follower.css' %}">
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+    <div id="mouse-follower"></div>
     <div class="dropdown-overlay" id="dropdown-overlay"></div>
 
     <header>
@@ -89,7 +91,7 @@
             <a href="{% url 'md5' %}" class="algorithm-nav-item md5-disabled">MD5</a>
             <a href="{% url 'sha512' %}" class="algorithm-nav-item">SHA-512</a>
             <a href="{% url 'diffie_hellman' %}" class="algorithm-nav-item">Diffie-Hellman</a>
-            <a href="#hmac" class="algorithm-nav-item hmac-disabled">HMAC</a>
+            <a href="{% url 'hmac' %}" class="algorithm-nav-item">HMAC</a>
         </nav>
     </div>
     {% endif %}
@@ -775,5 +777,57 @@
     });
     </script>
     {% block extra_js %}{% endblock %}
+</body>
+<script>
+// Smooth mouse follower effect
+const follower = document.getElementById('mouse-follower');
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+let currentX = mouseX;
+let currentY = mouseY;
+const speed = 0.08; // Slower speed for more natural trailing effect
+
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+// Interactive scaling for click and hover
+let isMouseDown = false;
+let isHovering = false;
+
+document.addEventListener('mousedown', () => {
+    isMouseDown = true;
+    follower.style.transform = 'translate(-50%, -50%) scale(0.7)';
+    follower.style.opacity = '0.7';
+});
+document.addEventListener('mouseup', () => {
+    isMouseDown = false;
+    follower.style.transform = 'translate(-50%, -50%) scale(1)';
+    follower.style.opacity = '1';
+});
+
+document.querySelectorAll('a, button, input, textarea').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+        isHovering = true;
+        follower.style.transform = 'translate(-50%, -50%) scale(1.3)';
+        follower.style.opacity = '0.5';
+    });
+    el.addEventListener('mouseleave', () => {
+        isHovering = false;
+        follower.style.transform = isMouseDown ? 'translate(-50%, -50%) scale(0.7)' : 'translate(-50%, -50%) scale(1)';
+        follower.style.opacity = isMouseDown ? '0.7' : '1';
+    });
+});
+
+function animateFollower() {
+    currentX += (mouseX - currentX) * speed;
+    currentY += (mouseY - currentY) * speed;
+    follower.style.left = currentX + 'px';
+    follower.style.top = currentY + 'px';
+    requestAnimationFrame(animateFollower);
+}
+animateFollower();
+</script>
 </body>
 </html>
