@@ -234,6 +234,15 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(updateVisualization, 100); // Wait for result to update
         });
     }
+
+    // Add spinning icon on form submission
+    const form = document.querySelector('form');
+    if (form && processBtn) {
+        form.addEventListener('submit', function(e) {
+            processBtn.innerHTML = '<span class="btn-text">Processing...</span><span class="btn-icon"><i class="fas fa-spinner fa-spin"></i></span><span class="tooltiptext">Processing cipher operation</span>';
+            processBtn.disabled = true;
+        });
+    }
 });
 </script>
 {% endblock %}
