@@ -907,7 +907,7 @@
 
             // Show processing state
             const originalText = processBtn.querySelector('.btn-text').textContent;
-            processBtn.querySelector('.btn-text').textContent = 'Processing...';
+            processBtn.innerHTML = '<span class="btn-text">Processing...</span><span class="btn-icon"><i class="fas fa-spinner fa-spin"></i></span>';
             processBtn.disabled = true;
 
             try {
@@ -967,7 +967,7 @@
                 showNotification('Error processing hash: ' + error.message, 'error');
             } finally {
                 // Restore button state
-                processBtn.querySelector('.btn-text').textContent = originalText;
+                processBtn.innerHTML = `<span class="btn-text">${originalText}</span><span class="btn-icon"><i class="fas fa-cog"></i></span><span class="tooltiptext">${originalText}</span>`;
                 processBtn.disabled = false;
             }
         });
