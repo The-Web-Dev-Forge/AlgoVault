@@ -52,20 +52,24 @@
                 </button>
                 <button type="button" id="clear-btn" class="btn btn-secondary">
                     <span class="btn-text">Clear </span>
-                    <span class="btn-icon"><i class="fas fa-eraser"></i></span>
+                    <span class="btn-icon"><i class="fas fa-trash"></i></span>
                 </button>
             </div>
         </form>
         
-        {% if is_post and result %}
         <div class="result-section" id="result-section">
             <h3>Result</h3>
-            <div class="result-box" id="result-output">{{ result }}</div>
+            <div class="result-box" id="result-output"></div>
             <button type="button" id="copy-btn" class="btn btn-accent copy-btn">
                 <i class="fas fa-copy"></i> Copy Result
             </button>
         </div>
-        {% endif %}
+    </section>
+
+    <!-- Dynamic AES Visualization Section -->
+    <section class="aes-visualization" id="aes-visualization" style="display: none;">
+        <h2 class="section-title" id="visualization-title">Encryption Visualization</h2>
+        <div id="visualization-content"></div>
     </section>
 
     <!-- AES Visualization Section -->
@@ -97,7 +101,7 @@
                     </div>
                     <div class="aes-step">
                         <h5 class="aes-step-title">After MixColumns</h5>
-                        {% if round.round == 10 %}<p class="step-note">(Skipped)</p>{% endif %}
+                        {# Removed (Skipped) note for round 10 #}
                         <div class="aes-state-grid">{% for row in round.afterMixColumns_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
                     </div>
                     <div class="aes-step">
@@ -119,7 +123,7 @@
                     </div>
                     <div class="aes-step">
                         <h5 class="aes-step-title">After Inv. MixColumns</h5>
-                         {% if round.round == 10 %}<p class="step-note">(Skipped)</p>{% endif %}
+                         {% if round.round == 10 %}<p class="step-note"></p>{% endif %}
                         <div class="aes-state-grid">{% for row in round.afterInvMixColumns_grid %}{% for cell in row %}<div class="aes-state-cell">{{ cell }}</div>{% endfor %}{% endfor %}</div>
                     </div>
                     {% endif %}
@@ -244,6 +248,169 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => { notification.style.display = 'none'; }, 300); // Hide after fade-out
         }, 3000);
     }
+
+    // Function to create visualization dynamically
+    function createVisualization(blocksData, operation) {
+        const visualizationSection = document.getElementById('aes-visualization');
+        const visualizationTitle = document.getElementById('visualization-title');
+        const visualizationContent = document.getElementById('visualization-content');
+        
+        // Update title
+        visualizationTitle.textContent = operation.charAt(0).toUpperCase() + operation.slice(1) + 'ion Visualization';
+        
+        // Clear previous content
+        visualizationContent.innerHTML = '';
+        
+        // Create blocks
+        blocksData.forEach(block => {
+            const blockDiv = document.createElement('div');
+            blockDiv.className = 'aes-block';
+            blockDiv.innerHTML = `<h3 class="aes-block-title">Block ${block.block}</h3>`;
+            
+            // Create rounds
+            block.rounds.forEach(round => {
+                const roundDiv = document.createElement('div');
+                roundDiv.className = 'aes-round';
+                
+                let roundHTML = `
+                    <h4 class="aes-round-title">Round ${round.round}</h4>
+                    <div class="aes-steps-container">
+                        <div class="aes-step">
+                            <h5 class="aes-step-title">Start of Round</h5>
+                            <div class="aes-state-grid">
+                `;
+                
+                // Add start of round grid
+                if (round.startOfRound_grid) {
+                    round.startOfRound_grid.forEach(row => {
+                        row.forEach(cell => {
+                            roundHTML += `<div class="aes-state-cell">${cell}</div>`;
+                        });
+                    });
+                }
+                roundHTML += '</div></div>';
+                
+                if (operation === 'encrypt') {
+                    // Encryption steps
+                    if (round.afterSubBytes_grid) {
+                        roundHTML += `
+                            <div class="aes-step">
+                                <h5 class="aes-step-title">After SubBytes</h5>
+                                <div class="aes-state-grid">`;
+                        round.afterSubBytes_grid.forEach(row => {
+                            row.forEach(cell => {
+                                roundHTML += `<div class="aes-state-cell">${cell}</div>`;
+                            });
+                        });
+                        roundHTML += '</div></div>';
+                    }
+                    
+                    if (round.afterShiftRows_grid) {
+                        roundHTML += `
+                            <div class="aes-step">
+                                <h5 class="aes-step-title">After ShiftRows</h5>
+                                <div class="aes-state-grid">`;
+                        round.afterShiftRows_grid.forEach(row => {
+                            row.forEach(cell => {
+                                roundHTML += `<div class="aes-state-cell">${cell}</div>`;
+                            });
+                        });
+                        roundHTML += '</div></div>';
+                    }
+                    
+                    if (round.afterMixColumns_grid) {
+                        roundHTML += `
+                            <div class="aes-step">
+                                <h5 class="aes-step-title">After MixColumns</h5>
+                                ${round.round === 10 ? '<p class="step-note"></p>' : ''}
+                                <div class="aes-state-grid">`;
+                        round.afterMixColumns_grid.forEach(row => {
+                            row.forEach(cell => {
+                                roundHTML += `<div class="aes-state-cell">${cell}</div>`;
+                            });
+                        });
+                        roundHTML += '</div></div>';
+                    }
+                    
+                    if (round.afterAddRoundKey_grid) {
+                        roundHTML += `
+                            <div class="aes-step">
+                                <h5 class="aes-step-title">After AddRoundKey</h5>
+                                <div class="aes-state-grid">`;
+                        round.afterAddRoundKey_grid.forEach(row => {
+                            row.forEach(cell => {
+                                roundHTML += `<div class="aes-state-cell">${cell}</div>`;
+                            });
+                        });
+                        roundHTML += '</div></div>';
+                    }
+                } else {
+                    // Decryption steps
+                    if (round.afterInvShiftRows_grid) {
+                        roundHTML += `
+                            <div class="aes-step">
+                                <h5 class="aes-step-title">After Inv. ShiftRows</h5>
+                                <div class="aes-state-grid">`;
+                        round.afterInvShiftRows_grid.forEach(row => {
+                            row.forEach(cell => {
+                                roundHTML += `<div class="aes-state-cell">${cell}</div>`;
+                            });
+                        });
+                        roundHTML += '</div></div>';
+                    }
+                    
+                    if (round.afterInvSubBytes_grid) {
+                        roundHTML += `
+                            <div class="aes-step">
+                                <h5 class="aes-step-title">After Inv. SubBytes</h5>
+                                <div class="aes-state-grid">`;
+                        round.afterInvSubBytes_grid.forEach(row => {
+                            row.forEach(cell => {
+                                roundHTML += `<div class="aes-state-cell">${cell}</div>`;
+                            });
+                        });
+                        roundHTML += '</div></div>';
+                    }
+                    
+                    if (round.afterAddRoundKey_grid) {
+                        roundHTML += `
+                            <div class="aes-step">
+                                <h5 class="aes-step-title">After AddRoundKey</h5>
+                                <div class="aes-state-grid">`;
+                        round.afterAddRoundKey_grid.forEach(row => {
+                            row.forEach(cell => {
+                                roundHTML += `<div class="aes-state-cell">${cell}</div>`;
+                            });
+                        });
+                        roundHTML += '</div></div>';
+                    }
+                    
+                    if (round.afterInvMixColumns_grid) {
+                        roundHTML += `
+                            <div class="aes-step">
+                                <h5 class="aes-step-title">After Inv. MixColumns</h5>
+                                ${round.round === 10 ? '<p class="step-note">(Skipped)</p>' : ''}
+                                <div class="aes-state-grid">`;
+                        round.afterInvMixColumns_grid.forEach(row => {
+                            row.forEach(cell => {
+                                roundHTML += `<div class="aes-state-cell">${cell}</div>`;
+                            });
+                        });
+                        roundHTML += '</div></div>';
+                    }
+                }
+                
+                roundHTML += '</div>';
+                roundDiv.innerHTML = roundHTML;
+                blockDiv.appendChild(roundDiv);
+            });
+            
+            visualizationContent.appendChild(blockDiv);
+        });
+        
+        // Show the visualization section
+        visualizationSection.style.display = 'block';
+    }
     
     if (copyBtn) {
         copyBtn.addEventListener('click', function() {
@@ -269,13 +436,80 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Add spinning icon on form submission
+    // Add AJAX processing functionality
     const form = document.querySelector('form');
     const processBtn = document.getElementById('process-btn');
+    const resultSection = document.getElementById('result-section');
+    const resultOutput = document.getElementById('result-output');
+    
     if (form && processBtn) {
-        form.addEventListener('submit', function(e) {
+        processBtn.addEventListener('click', async function(e) {
+            e.preventDefault(); // Prevent form submission
+            
+            // Get form data
+            const message = document.getElementById('message').value.trim();
+            const key = document.getElementById('key').value.trim();
+            const operation = document.getElementById('operation').value;
+            
+            // Validate inputs
+            if (!message) {
+                showNotification('Please enter a message.', 'error');
+                return;
+            }
+            
+            if (!key) {
+                showNotification('Please enter a key.', 'error');
+                return;
+            }
+            
+            if (key.length !== 16) {
+                showNotification('AES key must be exactly 16 characters long.', 'error');
+                return;
+            }
+            
+            // Update button state
             processBtn.innerHTML = '<span class="btn-text">Processing...</span><span class="btn-icon"><i class="fas fa-spinner fa-spin"></i></span>';
             processBtn.disabled = true;
+            
+            try {
+                // Make API request
+                const response = await fetch('/api/aes/process/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        key: key,
+                        operation: operation
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'An unknown error occurred.');
+                }
+                
+                // Display result
+                resultOutput.textContent = data.result;
+                resultSection.style.display = 'block';
+                
+                // Display visualization if available
+                if (data.blocks_data && data.blocks_data.length > 0) {
+                    createVisualization(data.blocks_data, data.operation);
+                }
+                
+                showNotification('AES processing completed successfully!', 'success');
+                
+            } catch (error) {
+                showNotification(`Error: ${error.message}`, 'error');
+            } finally {
+                // Restore button state
+                processBtn.innerHTML = '<span class="btn-text">Process</span><span class="btn-icon"><i class="fas fa-cog"></i></span>';
+                processBtn.disabled = false;
+            }
         });
     }
 
@@ -287,14 +521,31 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('key').value = '';
             document.getElementById('operation').selectedIndex = 0;
             
-            // Hide result section if visible
-            const resultSection = document.getElementById('result-section');
+            // Hide result section and clear output
             if (resultSection) {
                 resultSection.style.display = 'none';
+            }
+            if (resultOutput) {
+                resultOutput.textContent = '';
+            }
+            
+            // Hide visualization section
+            const visualizationSection = document.getElementById('aes-visualization');
+            if (visualizationSection) {
+                visualizationSection.style.display = 'none';
             }
             
             showNotification('Form cleared successfully!', 'success');
         });
+    }
+    
+    // Hide result and visualization sections initially
+    if (resultSection) {
+        resultSection.style.display = 'none';
+    }
+    const visualizationSection = document.getElementById('aes-visualization');
+    if (visualizationSection) {
+        visualizationSection.style.display = 'none';
     }
 });
 </script>
