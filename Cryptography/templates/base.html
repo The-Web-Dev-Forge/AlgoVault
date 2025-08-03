@@ -14,6 +14,9 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+{% if request.resolver_match.url_name == "landing" %}
+    {% include "landing_overlay.html" %}
+{% endif %}
     <div id="mouse-follower"></div>
     <div class="dropdown-overlay" id="dropdown-overlay"></div>
 
@@ -55,14 +58,14 @@
                                     </div>
                                 </div>
                             <ul class="dropdown-menu">
-                                <li class="dropdown-item"><a href="#profile"><i class="fas fa-user-circle"></i> My Profile</a></li>
-                                <li class="dropdown-item"><a href="#account"><i class="fas fa-cog"></i> Account Settings</a></li>
-                                <li class="dropdown-item"><a href="#billing"><i class="fas fa-credit-card"></i> Billing & Plans</a></li>
-                                <li class="dropdown-item"><a href="#security"><i class="fas fa-shield-alt"></i> Security</a></li>
+                                <li class="dropdown-item"><a href="{% url 'profile_error' %}"><i class="fas fa-user-circle"></i> My Profile</a></li>
+                                <li class="dropdown-item"><a href="{% url 'account_settings_error' %}"><i class="fas fa-cog"></i> Account Settings</a></li>
+                                <li class="dropdown-item"><a href="{% url 'billing_error' %}"><i class="fas fa-credit-card"></i> Billing & Plans</a></li>
+                                <li class="dropdown-item"><a href="{% url 'security_error' %}"><i class="fas fa-shield-alt"></i> Security</a></li>
                             </ul>
                             <div class="dropdown-divider"></div>
                             <ul class="dropdown-menu">
-                                <li class="dropdown-item"><a href="#help-support"><i class="fas fa-question-circle"></i> Help & Support</a></li>
+                                <li class="dropdown-item"><a href="{% url 'help_support_error' %}"><i class="fas fa-question-circle"></i> Help & Support</a></li>
                                 <li class="dropdown-item logout-item"><a href="{% url 'UserAuth:logout' %}" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                             </ul>
                         </div>
@@ -83,11 +86,11 @@
         <nav class="algorithm-nav" aria-label="Algorithm navigation">
             <a href="{% url 'caesar_cipher' %}" class="algorithm-nav-item">Caesar Cipher</a>
             <a href="{% url 'hill' %}" class="algorithm-nav-item">Hill Cipher</a>
-            <a href="#playfair" class="algorithm-nav-item playfair-disabled">Playfair Cipher</a>
+            <a href="{% url 'playfair_error' %}" class="algorithm-nav-item playfair-disabled">Playfair Cipher</a>
             <a href="{% url 'vigenere' %}" class="algorithm-nav-item">Vigenère Cipher</a>
             <a href="{% url 'aes' %}" class="algorithm-nav-item aes-disabled">AES</a>
             <a href="{% url 'des' %}" class="algorithm-nav-item">DES</a>
-            <a href="#rc5" class="algorithm-nav-item rc5-disabled">RC5</a>
+            <a href="{% url 'rc5_error' %}" class="algorithm-nav-item rc5-disabled">RC5</a>
             <a href="{% url 'md5' %}" class="algorithm-nav-item md5-disabled">MD5</a>
             <a href="{% url 'sha512' %}" class="algorithm-nav-item">SHA-512</a>
             <a href="{% url 'diffie_hellman' %}" class="algorithm-nav-item">Diffie-Hellman</a>
@@ -472,6 +475,49 @@
         line-height: 1.4;
     }
     
+    /* Enhanced message formatting styles */
+    .chat-messages-mini .message-bubble ul,
+    .chat-messages-mini .message-bubble ol {
+        margin: 0.5rem 0;
+        padding-left: 1.25rem;
+    }
+    
+    .chat-messages-mini .message-bubble li {
+        margin: 0.25rem 0;
+        line-height: 1.4;
+    }
+    
+    .chat-messages-mini .message-bubble .quiz-options {
+        list-style: none;
+        padding-left: 0;
+    }
+    
+    .chat-messages-mini .message-bubble .quiz-options li {
+        margin: 0.4rem 0;
+        padding: 0.25rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .chat-messages-mini .message-bubble .quiz-options li:last-child {
+        border-bottom: none;
+    }
+    
+    .chat-messages-mini .message-bubble p {
+        margin: 0.4rem 0;
+        line-height: 1.5;
+    }
+    
+    .chat-messages-mini .message-bubble h1,
+    .chat-messages-mini .message-bubble h2,
+    .chat-messages-mini .message-bubble h3,
+    .chat-messages-mini .message-bubble h4,
+    .chat-messages-mini .message-bubble h5,
+    .chat-messages-mini .message-bubble h6 {
+        margin: 0.8rem 0 0.4rem 0;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
     .chat-messages-mini .user-message .message-bubble {
         background: linear-gradient(135deg, var(--primary-color, #ff0000), #ff6b6b);
         color: white;
@@ -614,6 +660,153 @@
         const typingIndicatorMini = document.getElementById('typingIndicatorMini');
         
         let isOpen = false;
+        let conversationHistory = []; // Conversation memory for chat widget
+        
+        // Enhanced bot message formatting function (same as in chatbot.js)
+        function formatBotMessage(content) {
+            // Remove excessive emojis at the start of lines
+            content = content.replace(/^[🎯🔧✅❌⚡🚀📊🎨🔍💡🎉🎪⭐🔥📝🎭🎵🌟💫⭐️🔍📚🎓💻🔐🎯🎪🎨🎊🎈🎁🌈💎🎀🎊]+\s*/gm, '');
+            
+            // Clean up excessive bold formatting
+            content = content.replace(/\*\*[\-\s]*\*\*/g, '');
+            
+            // Convert markdown-like formatting to HTML
+            content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            
+            // Split content into lines for processing
+            const lines = content.split('\n');
+            let formatted = '';
+            let inList = false;
+            let inOrderedList = false;
+            let currentParagraph = '';
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                
+                if (!line) {
+                    // Empty line - end current paragraph/list
+                    if (inList) {
+                        formatted += '</ul>';
+                        inList = false;
+                    } else if (inOrderedList) {
+                        formatted += '</ol>';
+                        inOrderedList = false;
+                    } else if (currentParagraph) {
+                        formatted += `<p>${currentParagraph.trim()}</p>`;
+                        currentParagraph = '';
+                    }
+                    continue;
+                }
+                
+                // Check for quiz options (A) B) C) D) format
+                if (/^[A-D]\)\s/.test(line)) {
+                    if (!inList) {
+                        if (currentParagraph) {
+                            formatted += `<p>${currentParagraph.trim()}</p>`;
+                            currentParagraph = '';
+                        }
+                        formatted += '<ul class="quiz-options">';
+                        inList = true;
+                    }
+                    const optionText = line.substring(2).trim();
+                    formatted += `<li><strong>${line.charAt(0)}</strong>) ${optionText}</li>`;
+                    continue;
+                }
+                
+                // Check for numbered lists (1. 2. 3.)
+                if (/^\d+\.\s/.test(line)) {
+                    if (!inOrderedList) {
+                        if (currentParagraph) {
+                            formatted += `<p>${currentParagraph.trim()}</p>`;
+                            currentParagraph = '';
+                        }
+                        if (inList) {
+                            formatted += '</ul>';
+                            inList = false;
+                        }
+                        formatted += '<ol>';
+                        inOrderedList = true;
+                    }
+                    const listText = line.replace(/^\d+\.\s/, '');
+                    formatted += `<li>${listText}</li>`;
+                    continue;
+                }
+                
+                // Check for bullet points (- or •)
+                if (/^[-•]\s/.test(line)) {
+                    if (!inList) {
+                        if (currentParagraph) {
+                            formatted += `<p>${currentParagraph.trim()}</p>`;
+                            currentParagraph = '';
+                        }
+                        if (inOrderedList) {
+                            formatted += '</ol>';
+                            inOrderedList = false;
+                        }
+                        formatted += '<ul>';
+                        inList = true;
+                    }
+                    const listText = line.replace(/^[-•]\s/, '');
+                    formatted += `<li>${listText}</li>`;
+                    continue;
+                }
+                
+                // Check for headers
+                if (line.startsWith('#')) {
+                    if (inList) {
+                        formatted += '</ul>';
+                        inList = false;
+                    } else if (inOrderedList) {
+                        formatted += '</ol>';
+                        inOrderedList = false;
+                    } else if (currentParagraph) {
+                        formatted += `<p>${currentParagraph.trim()}</p>`;
+                        currentParagraph = '';
+                    }
+                    
+                    const level = line.match(/^#+/)[0].length;
+                    const text = line.replace(/^#+\s*/, '');
+                    formatted += `<h${Math.min(level, 6)}>${text}</h${Math.min(level, 6)}>`;
+                    continue;
+                }
+                
+                // Regular text - add to current paragraph
+                if (inList || inOrderedList) {
+                    // If we're in a list but this isn't a list item, close the list
+                    if (inList) {
+                        formatted += '</ul>';
+                        inList = false;
+                    } else if (inOrderedList) {
+                        formatted += '</ol>';
+                        inOrderedList = false;
+                    }
+                }
+                
+                if (currentParagraph) {
+                    currentParagraph += ' ' + line;
+                } else {
+                    currentParagraph = line;
+                }
+            }
+            
+            // Close any remaining open elements
+            if (inList) {
+                formatted += '</ul>';
+            } else if (inOrderedList) {
+                formatted += '</ol>';
+            } else if (currentParagraph) {
+                formatted += `<p>${currentParagraph.trim()}</p>`;
+            }
+            
+            return formatted || `<p>${content}</p>`;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
         
         function toggleChat() {
             isOpen = !isOpen;
@@ -639,7 +832,7 @@
                 </div>
                 <div class="message-content">
                     <div class="message-bubble">
-                        <p>${content}</p>
+                        ${isUser ? `<p>${escapeHtml(content)}</p>` : formatBotMessage(content)}
                     </div>
                 </div>
             `;
@@ -674,13 +867,25 @@
                         'Content-Type': 'application/json',
                         'X-CSRFToken': getCookie('csrftoken')
                     },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ 
+                        message: message,
+                        history: conversationHistory
+                    })
                 });
                 
                 const data = await response.json();
                 
                 if (!response.ok) {
                     throw new Error(data.error || 'Failed to get response');
+                }
+
+                // Add user message and AI response to conversation history
+                conversationHistory.push({role: "user", content: message});
+                conversationHistory.push({role: "assistant", content: data.response});
+
+                // Keep conversation history manageable (last 20 messages)
+                if (conversationHistory.length > 20) {
+                    conversationHistory = conversationHistory.slice(-20);
                 }
                 
                 return data.response;
