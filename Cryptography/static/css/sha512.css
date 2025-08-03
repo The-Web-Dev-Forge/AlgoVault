@@ -232,10 +232,24 @@
   word-break: break-all;
 }
 
-#result-section .result-box {
+#sha512-result-section .result-box {
     font-size: 0.9rem;      /* Slightly smaller font for the long hash string */
     letter-spacing: 1px;   /* Add some space between characters */
     line-height: 1.8;      /* Increase line height if the hash wraps */
+}
+
+/* Ensure the result section is properly visible and positioned */
+#sha512-result-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: var(--input-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: none; /* Hidden by default */
+}
+
+#sha512-result-section.show {
+    display: block;
 }
 
 /* Ensure the image in the 'About' section has a neutral background in case of transparency */
