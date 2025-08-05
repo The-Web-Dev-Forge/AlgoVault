@@ -1,0 +1,7 @@
+
+Django==5.2.3
+groq==0.30.0
+python-dotenv==1.0.1
+cryptography==45.0.5
+pycryptodome
+djangorestframework
