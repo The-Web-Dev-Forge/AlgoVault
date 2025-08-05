@@ -1,0 +1,295 @@
+<div id="matrixOverlay">
+    <div class="matrix-container" id="matrixContainer"></div>
+    <div class="glow-effect" id="glowEffect"></div>
+    <div class="scan-line"></div>
+    <div class="noise-overlay"></div>
+    <style>
+        #matrixOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 99999;
+            pointer-events: auto;
+            background: #000;
+            clip-path: circle(150vw at 50% 50%);
+            transition: clip-path 0.2s;
+        }
+        .matrix-container {
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+            display: grid; gap: 0; overflow: hidden; z-index: 1;
+        }
+        .matrix-cell {
+            font-size: 12px; font-weight: 400; display: flex; align-items: center; justify-content: center;
+            color: #F14A00; background: transparent; text-shadow: 0 0 2px #F14A00, 0 0 8px #000;
+            transition: all 0.1s;
+        }
+        .matrix-cell.primary { color: #F14A00; text-shadow: 0 0 8px #F14A00, 0 0 2px #000; }
+        .matrix-cell.secondary { color: #B83400; text-shadow: 0 0 2px #B83400; }
+        .matrix-cell.warning { color: #F14A00; text-shadow: 0 0 2px #F14A00; }
+        .matrix-cell.critical { color: #fff; text-shadow: 0 0 8px #F14A00; animation: critical-flash 0.5s infinite alternate; }
+        .matrix-cell.success { color: #F14A00; text-shadow: 0 0 2px #F14A00; }
+        .matrix-cell.encrypted { color: #7A2500; text-shadow: 0 0 2px #7A2500; }
+        .matrix-cell.white { color: #ffffff; text-shadow: 0 0 2px #ffffff, 0 0 4px #000; }
+        .matrix-cell.red { color: #F14A00; text-shadow: 0 0 2px #F14A00; }
+        .matrix-cell.dim { color: #1a1a1a; opacity: 0.2; }
+        @keyframes critical-flash { 0% { opacity: 0.7; } 100% { opacity: 1; } }
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(241,74,0,0.3) 50%, transparent 100%);
+            opacity: 0.2; animation: scan 12s linear infinite; z-index: 100;
+        }
+        @keyframes scan { 0% { transform: translateY(0); } 100% { transform: translateY(100vh); } }
+        .glow-effect { position: absolute; pointer-events: none; width: 100px; height: 100px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(241,74,0,0.12) 0%, rgba(241,74,0,0) 70%);
+            transform: translate(-50%, -50%); z-index: 999; opacity: 0; transition: opacity 0.3s;
+        }
+        .noise-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('data:image/png;base64,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');
+            opacity: 0.01; pointer-events: none; z-index: 100;
+        }
+        /* Overlay is just a static cover, no ripple animation */
+        #matrixOverlay.reveal {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+    </style>
+    <script>
+        class RedMatrix {
+            constructor() {
+                this.container = document.getElementById('matrixContainer');
+                this.glowEffect = document.getElementById('glowEffect');
+                this.cells = [];
+                this.rows = 0;
+                this.cols = 0;
+                this.animationComplete = false;
+                this.init();
+                this.startAnimation();
+                this.setupMouseTracking();
+            }
+            init() {
+                const cellWidth = 14, cellHeight = 18;
+                this.cols = Math.floor(window.innerWidth / cellWidth);
+                this.rows = Math.floor(window.innerHeight / cellHeight);
+                this.container.style.gridTemplateColumns = `repeat(${this.cols}, ${cellWidth}px)`;
+                this.container.style.gridTemplateRows = `repeat(${this.rows}, ${cellHeight}px)`;
+                this.container.innerHTML = '';
+                this.cells = [];
+                
+                // Create all cells but initially empty
+                for (let i = 0; i < this.rows * this.cols; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'matrix-cell red';
+                    cell.textContent = '';
+                    cell.style.width = cellWidth + 'px';
+                    cell.style.height = cellHeight + 'px';
+                    cell.style.opacity = '0';
+                    this.container.appendChild(cell);
+                    this.cells.push(cell);
+                }
+                
+                // Animate columns from left to right
+                this.animateColumnsLeftToRight();
+            }
+            
+            animateColumnsLeftToRight() {
+                // Calculate total animation time
+                const totalAnimationTime = (this.cols * 30) + (this.rows * 15);
+                
+                for (let col = 0; col < this.cols; col++) {
+                    setTimeout(() => {
+                        // Animate each cell in this column from top to bottom
+                        for (let row = 0; row < this.rows; row++) {
+                            setTimeout(() => {
+                                const index = row * this.cols + col;
+                                const cell = this.cells[index];
+                                if (cell) {
+                                    const content = this.getRandomCryptoData();
+                                    
+                                    // 70% red (#F14A00), 30% white ratio
+                                    const isRed = Math.random() < 0.7;
+                                    cell.className = isRed ? 'matrix-cell red' : 'matrix-cell white';
+                                    cell.textContent = content;
+                                    cell.style.opacity = '1';
+                                }
+                            }, row * 15); // Small delay between rows in the same column
+                        }
+                    }, col * 30); // Delay between columns
+                }
+                
+                // Set animation complete flag after all animations finish
+                setTimeout(() => {
+                    this.animationComplete = true;
+                    this.triggerPageTransition();
+                }, totalAnimationTime + 500); // Add 500ms buffer
+            }
+            
+            triggerPageTransition() {
+                // Only proceed if animation is complete
+                if (this.animationComplete) {
+                    document.getElementById('matrixOverlay').classList.add('reveal');
+                    setTimeout(() => {
+                        document.getElementById('matrixOverlay').style.display = 'none';
+                        document.body.style.overflow = '';
+                        // Trigger landing content ripple
+                        var landingContent = document.getElementById('landingRippleContent');
+                        if (landingContent) {
+                            landingContent.classList.remove('ripple-hidden');
+                            landingContent.classList.add('ripple-reveal');
+                        }
+                    }, 300); // allow fade out
+                }
+            }
+            getRandomCryptoData() {
+                const dataTypes = [
+                    () => Math.floor(Math.random() * 16).toString(16).toUpperCase(),
+                    () => Math.floor(Math.random() * 10).toString(),
+                    () => String.fromCharCode(65 + Math.floor(Math.random() * 26)),
+                    () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0').toUpperCase(),
+                    () => Math.floor(Math.random() * 2).toString(),
+                    () => ['A', 'B', 'C', 'D', 'E', 'F'][Math.floor(Math.random() * 6)],
+                    () => ['∑', '∆', 'Ω', 'π', '∞', '√', '∫', '≡', '≠', '⊗', '⊕', '⊖', '⊙', '⊘'][Math.floor(Math.random() * 14)],
+                    () => {
+                        const snippets = ['7F2', 'E9A', 'C0D', '1B3', 'F8E', 'D4C', '2A6', 'B7D'];
+                        return snippets[Math.floor(Math.random() * snippets.length)].charAt(Math.floor(Math.random() * 3));
+                    },
+                    () => {
+                        const base64chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+                        return base64chars.charAt(Math.floor(Math.random() * base64chars.length));
+                    }
+                ];
+                return dataTypes[Math.floor(Math.random() * dataTypes.length)]();
+            }
+            updateCell(index) {
+                const cell = this.cells[index];
+                if (!cell) return;
+                const content = this.getRandomCryptoData();
+                cell.textContent = content;
+                
+                // 70% red (#F14A00), 30% white ratio for all characters
+                const isRed = Math.random() < 0.7;
+                cell.className = isRed ? 'matrix-cell red' : 'matrix-cell white';
+            }
+            startAnimation() {
+                setInterval(() => {
+                    const numUpdates = Math.floor(Math.random() * 80) + 60;
+                    for (let i = 0; i < numUpdates; i++) {
+                        const randomIndex = Math.floor(Math.random() * this.cells.length);
+                        this.updateCell(randomIndex);
+                    }
+                }, 40);
+                setInterval(() => {
+                    const col = Math.floor(Math.random() * this.cols);
+                    for (let row = 0; row < this.rows; row++) {
+                        setTimeout(() => {
+                            const index = row * this.cols + col;
+                            this.updateCell(index);
+                        }, row * 20);
+                    }
+                }, 180);
+                setInterval(() => {
+                    const startRow = Math.floor(Math.random() * this.rows);
+                    for (let i = 0; i < this.cols; i++) {
+                        setTimeout(() => {
+                            const index = startRow * this.cols + i;
+                            this.updateCell(index);
+                        }, i * 8);
+                    }
+                }, 350);
+                setInterval(() => {
+                    const numCritical = Math.floor(Math.random() * 5) + 1;
+                    for (let i = 0; i < numCritical; i++) {
+                        const randomIndex = Math.floor(Math.random() * this.cells.length);
+                        const cell = this.cells[randomIndex];
+                        if (cell) {
+                            // Flash effect - temporarily make white, then return to red/white ratio
+                            cell.className = 'matrix-cell white';
+                            cell.textContent = ['!', '*', '#', '@', '§', '¶', '∆'][Math.floor(Math.random() * 7)];
+                            setTimeout(() => {
+                                this.updateCell(randomIndex);
+                            }, 500);
+                        }
+                    }
+                }, 2000);
+                setInterval(() => {
+                    const startRow = Math.floor(Math.random() * (this.rows - 5));
+                    const startCol = Math.floor(Math.random() * (this.cols - 8));
+                    for (let r = 0; r < 5; r++) {
+                        for (let c = 0; c < 8; c++) {
+                            setTimeout(() => {
+                                const index = (startRow + r) * this.cols + (startCol + c);
+                                const cell = this.cells[index];
+                                if (cell) {
+                                    // Maintain 70:30 red:white ratio for block updates
+                                    const isRed = Math.random() < 0.7;
+                                    cell.className = isRed ? 'matrix-cell red' : 'matrix-cell white';
+                                    cell.textContent = this.getRandomCryptoData();
+                                }
+                            }, (r * 8 + c) * 10);
+                        }
+                    }
+                }, 5000);
+                setInterval(() => {
+                    const numRains = Math.floor(Math.random() * 3) + 1;
+                    for (let rain = 0; rain < numRains; rain++) {
+                        const col = Math.floor(Math.random() * this.cols);
+                        const rainLength = Math.floor(Math.random() * 10) + 5;
+                        for (let i = 0; i < rainLength; i++) {
+                            setTimeout(() => {
+                                for (let j = 0; j < this.rows; j++) {
+                                    if (j < i || j > i + 5) continue;
+                                    const index = j * this.cols + col;
+                                    const cell = this.cells[index];
+                                    if (cell) {
+                                        // Rain effect with 70:30 ratio, but leading edge is more likely white
+                                        let isRed;
+                                        if (j === i) isRed = Math.random() < 0.3; // Leading edge more white
+                                        else isRed = Math.random() < 0.7; // Rest follows normal ratio
+                                        
+                                        cell.className = isRed ? 'matrix-cell red' : 'matrix-cell white';
+                                        cell.textContent = this.getRandomCryptoData();
+                                    }
+                                }
+                            }, i * 100);
+                        }
+                    }
+                }, 3000);
+            }
+            setupMouseTracking() {
+                document.addEventListener('mousemove', (e) => {
+                    this.glowEffect.style.left = `${e.clientX}px`;
+                    this.glowEffect.style.top = `${e.clientY}px`;
+                    this.glowEffect.style.opacity = '1';
+                    if (Math.random() < 0.4) {
+                        const cellWidth = 14, cellHeight = 18;
+                        const col = Math.floor(e.clientX / cellWidth);
+                        const row = Math.floor(e.clientY / cellHeight);
+                        for (let r = -4; r <= 4; r++) {
+                            for (let c = -4; c <= 4; c++) {
+                                const targetRow = row + r, targetCol = col + c;
+                                if (targetRow >= 0 && targetRow < this.rows && targetCol >= 0 && targetCol < this.cols) {
+                                    const index = targetRow * this.cols + targetCol;
+                                    if (Math.random() < 0.5) this.updateCell(index);
+                                }
+                            }
+                        }
+                    }
+                });
+                document.addEventListener('mouseout', () => {
+                    this.glowEffect.style.opacity = '0';
+                });
+            }
+        }
+        let matrix;
+        function initMatrix() { matrix = new RedMatrix(); }
+        window.addEventListener('resize', () => {
+            clearTimeout(window.resizeTimeout);
+            window.resizeTimeout = setTimeout(() => { 
+                matrix.animationComplete = false; // Reset animation flag on resize
+                matrix.init(); 
+            }, 100);
+        });
+        initMatrix();
+    </script>
+</div>
