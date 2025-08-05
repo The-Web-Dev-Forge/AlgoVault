@@ -25,7 +25,7 @@
                         AI Cryptography Assistant
                     </h1>
                     <p class="page-subtitle">
-                        Get instant help with cryptographic algorithms and concepts powered by Gemini AI
+                        Get instant help with cryptographic algorithms and concepts powered by Google Gemma2 AI
                     </p>
                 </div>
                 <div class="header-visual">
@@ -50,16 +50,34 @@
                         </div>
                         <div class="message-content">
                             <div class="message-bubble">
-                                <p>Hello! I'm your AI cryptography assistant. I'm here to help you understand cryptographic algorithms, explain concepts, and answer any questions about the algorithms available on AlgoVault.</p>
-                                <p>Feel free to ask me about:</p>
-                                <ul>
-                                    <li>Caesar Cipher and other classical ciphers</li>
-                                    <li>Modern encryption like AES and DES</li>
-                                    <li>Hash functions (MD5, SHA-512)</li>
-                                    <li>Key exchange protocols</li>
-                                    <li>Cryptographic concepts and theory</li>
-                                </ul>
-                                <p>What would you like to learn about today?</p>
+                                <p>Hello! I'm your AI cryptography assistant. Choose how you'd like to interact with me:</p>
+                                
+                                <!-- Mode Selection -->
+                                <div class="mode-selection">
+                                    <div class="mode-option" data-mode="learning">
+                                        <i class="fas fa-book-open"></i>
+                                        <div class="mode-content">
+                                            <h4>Learning Mode</h4>
+                                            <p>Ask questions, explore concepts, and learn about cryptographic algorithms</p>
+                                        </div>
+                                    </div>
+                                    <div class="mode-option" data-mode="quiz">
+                                        <i class="fas fa-brain"></i>
+                                        <div class="mode-content">
+                                            <h4>Test Yourself</h4>
+                                            <p>Take interactive quizzes to test your cryptography knowledge</p>
+                                        </div>
+                                    </div>
+                                    <div class="mode-option" data-mode="chat">
+                                        <i class="fas fa-comments"></i>
+                                        <div class="mode-content">
+                                            <h4>Interactive Chat</h4>
+                                            <p>Have an open conversation and ask any crypto-related questions directly</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">You can switch modes anytime by saying "learning mode", "quiz mode", or "interactive chat mode"</p>
                             </div>
                             <div class="message-time">
                                 <span id="welcomeTime"></span>
@@ -102,7 +120,7 @@
                             <span id="charCount">0</span>/1000
                         </span>
                         <span class="powered-by">
-                            Powered by <i class="fab fa-google"></i> Gemini AI
+                            Powered by 🧠 Gemma2 AI
                         </span>
                     </div>
                 </div>
