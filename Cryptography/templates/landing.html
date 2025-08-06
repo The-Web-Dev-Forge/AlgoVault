@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% include "landing_overlay.html" %}
 {% load static %}
 
 {% block title %}Welcome to AlgoVault{% endblock %}
@@ -44,37 +45,103 @@
                 </div>
             </div>
             <div class="hero-visual">
-                <div class="cipher-wheel">
-                    <div class="wheel-inner">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <div class="wheel-outer">
-                        <div class="wheel-segment"><span>A</span></div>
-                        <div class="wheel-segment"><span>E</span></div>
-                        <div class="wheel-segment"><span>S</span></div>
-                        <div class="wheel-segment"><span>D</span></div>
-                        <div class="wheel-segment"><span>M</span></div>
-                        <div class="wheel-segment"><span>H</span></div>
-                        <div class="wheel-segment"><span>C</span></div>
-                        <div class="wheel-segment"><span>V</span></div>
-                    </div>
-                </div>
-                
-                <!-- Floating Elements -->
-                <div class="floating-elements">
-                    <div class="floating-icon floating-icon-1">
-                        <i class="fas fa-key"></i>
-                    </div>
-                    <div class="floating-icon floating-icon-2">
-                        <i class="fas fa-lock"></i>
-                    </div>
-                    <div class="floating-icon floating-icon-3">
-                        <i class="fas fa-fingerprint"></i>
-                    </div>
-                    <div class="floating-icon floating-icon-4">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
-                </div>
+                <div class="right-half-container">
+      <svg id="noise-svg">
+        <!-- gives background a bit of texture -->
+        <filter id='noiseFilter'>
+            <feTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch' />
+        </filter>
+        <rect id="noise-rect" filter='url(#noiseFilter)' />
+      </svg>
+
+      <div class="clock off">
+      <div class="shadow"></div>
+  
+      <div class="base-container"><div class="base"><div></div></div></div>
+      <div class="small-outer-pipe">
+        <div class="small-inner-pipe"></div>
+      </div>
+      <div class="outer-pipe">
+        <div class="inner-pipe"></div>
+      </div>
+      <div class="pipe-accents">
+        <div class="top-tube"></div>
+        <div class="tube-holders">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div class="top"></div>
+        <div class="topinset"></div>
+        <div class="left"><div></div><div></div><div></div></div>
+        <div class="right"><div></div><div></div><div></div></div>
+        <div class="bottom-left"></div>
+        <div class="bottom-right"></div>
+      </div>
+  
+      <div class="display">
+        <div class="row">
+          <div class="col"><div>8</div><div id="char01">A</div><div id="char02">A</div></div>
+          <div class="col"><div>8</div><div id="char11">L</div><div id="char12">L</div></div>
+        </div>
+        <div style="height: 3px;"></div>
+        <div class="row">
+          <div class="col"><div>8</div><div id="char21">G</div><div id="char22">G</div></div>
+          <div class="col"><div>8</div><div id="char31">O</div><div id="char32">O</div></div>
+        </div>
+        <div style="height: 3px;"></div>
+        <div class="small-row">
+          <div class="row">
+            <div class="col"><div>8</div><div id="char41"> </div><div id="char42"> </div></div>
+            <div class="col"><div>8</div><div id="char51"> </div><div id="char52"> </div></div>
+          </div>
+        </div>
+        <div style="height: 3px;"></div>
+        <div class="row">
+          <div class="col"><div>8</div><div id="char61">V</div><div id="char62">V</div></div>
+          <div class="col"><div>8</div><div id="char71">A</div><div id="char72">A</div></div>
+        </div>
+        <div style="height: 3px;"></div>
+        <div class="row">
+          <div class="col"><div>8</div><div id="char81">U</div><div id="char82">U</div></div>
+          <div class="col"><div>8</div><div id="char91">L</div><div id="char92">L</div></div>
+        </div>
+        <div style="height: 3px;"></div>
+        <div class="row">
+          <div class="col"><div>8</div><div id="char101">T</div><div id="char102">T</div></div>
+          <div class="col"><div>8</div><div id="char111"> </div><div id="char112"> </div></div>
+        </div>
+      </div>
+  
+      <div class="glass-tube"></div>
+      <div class="hex">
+        <div class="overlay"></div>
+      </div>
+  
+      <div class="tube-base-container">
+        <div class="wires"><div></div><div></div></div>
+        <div class="tube-base"></div>
+        <div class="rods">
+          <div class="left-rod"></div>
+          <div class="center-rod"></div>
+          <div class="right-rod"></div>
+        </div>
+        <div class="tube-btm"></div>
+      </div>
+  
+      <div class="power-cord">
+        <div></div>
+        <div></div>
+      </div>
+      <div class="button" onclick="body.querySelector('.clock').classList.toggle('off')">
+        <div></div>
+      </div> 
+    </div>
+    </div>
+            </div>
             </div>
         </div>
     </section>
@@ -145,7 +212,7 @@
                         <i class="fas fa-robot"></i>
                     </div>
                     <h3>AI Assistant</h3>
-                    <p>Get instant help and explanations about cryptographic concepts with our AI-powered assistant using Gemini AI.</p>
+                    <p>Get instant help and explanations about cryptographic concepts with our AI-powered assistant using Groq AI.</p>
                     <ul class="feature-list">
                         <li><i class="fas fa-check"></i> <a href="{% url 'ChatBot:chatbot' %}">Interactive Chat Interface</a></li>
                         <li><i class="fas fa-check"></i> Algorithm Explanations</li>
@@ -289,7 +356,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
+    document.addEventListener('DOMContentLoaded', function() {
+        var overlay = document.getElementById('matrixOverlay');
+        var landingContent = document.getElementById('landingRippleContent');
+        if (overlay && landingContent) {
+            setTimeout(function() {
+                landingContent.classList.remove('ripple-hidden');
+                landingContent.classList.add('ripple-reveal');
+            }, 600 + 2200); // match overlay timing: overlay delay + overlay animation
+        } else if (landingContent) {
+            // fallback: show immediately if overlay not present
+            landingContent.classList.remove('ripple-hidden');
+            landingContent.classList.add('ripple-reveal');
+        }
+    });
     // Add parallax effect to hero section
     window.addEventListener('scroll', () => {
         const scrolled = window.pageYOffset;
@@ -334,6 +414,82 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typewriterElement) {
         typeWriter(typewriterElement, 'AlgoVault', 80);
     }
+});
+// ALGOVAULT display - each character gets its own display segment
+function updateDisplay() {
+  // A
+  document.getElementById('char01').textContent = 'A';
+  document.getElementById('char02').textContent = 'A';
+  
+  // L  
+  document.getElementById('char11').textContent = 'L';
+  document.getElementById('char12').textContent = 'L';
+  
+  // G
+  document.getElementById('char21').textContent = 'G';
+  document.getElementById('char22').textContent = 'G';
+  
+  // O
+  document.getElementById('char31').textContent = 'O';
+  document.getElementById('char32').textContent = 'O';
+  
+  // V (moved to row 3)
+  document.getElementById('char61').textContent = 'V';
+  document.getElementById('char62').textContent = 'V';
+  
+  // A (moved to row 3)
+  document.getElementById('char71').textContent = 'A';
+  document.getElementById('char72').textContent = 'A';
+  
+  // U (moved to row 4)
+  document.getElementById('char81').textContent = 'U';
+  document.getElementById('char82').textContent = 'U';
+  
+  // L (moved to row 4)
+  document.getElementById('char91').textContent = 'L';
+  document.getElementById('char92').textContent = 'L';
+  
+  // T (moved to row 5)
+  document.getElementById('char101').textContent = 'T';
+  document.getElementById('char102').textContent = 'T';
+  
+  // Clear the remaining unused positions
+  const unusedIds = ['char41', 'char42', 'char51', 'char52', 'char111', 'char112'];
+  unusedIds.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = ' ';
+    }
+  });
+}
+
+function toggleLights() {
+  const clockElement = document.querySelector('.clock');
+  clockElement.classList.toggle('off');
+}
+
+// Initialize display
+updateDisplay();
+
+// Toggle lights every 10 seconds (10000 milliseconds)
+setInterval(toggleLights, 10000);
+
+// Add hover functionality to the clock
+document.addEventListener('DOMContentLoaded', function() {
+  const clockElement = document.querySelector('.clock');
+  
+  if (clockElement) {
+    // Add hover event listeners
+    clockElement.addEventListener('mouseenter', function() {
+      // Turn on lights when hovering
+      clockElement.classList.remove('off');
+    });
+    
+    clockElement.addEventListener('mouseleave', function() {
+      // Turn off lights when not hovering (optional - you can remove this if you want lights to stay on)
+      clockElement.classList.add('off');
+    });
+  }
 });
 </script>
 {% endblock %}
