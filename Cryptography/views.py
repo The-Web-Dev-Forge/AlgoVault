@@ -9,6 +9,18 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import sys
 
+def error_page(request, exception=None, message=None):
+    """Renders the generic error page for unsupported or missing algorithm pages."""
+    # Use message from URL pattern first, then GET params, then default
+    if not message:
+        message = request.GET.get('message')
+    if not message:
+        message = 'Sorry, Page not found.....'
+    context = {
+        'error_message': message
+    }
+    return render(request, 'ErrorPage.html', context)
+
 
 # Add the Algorithm/Crypto_Fallback/Python directory to sys.path
 algorithm_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Algorithm', 'Crypto_Fallback', 'Python')
@@ -477,7 +489,7 @@ def aes_view(request):
         else:
             output_data = None
             try:
-                # Try Java implementation first
+                # Use Java implementation as primary
                 java_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Algorithm', 'Crypto_Native', 'JAVA')
                 java_file = os.path.join(java_dir, 'AES.java')
                 class_file = os.path.join(java_dir, 'AES.class')
@@ -494,14 +506,21 @@ def aes_view(request):
                 
                 if result.stdout.strip():
                     output_data = json.loads(result.stdout.strip())
-                
+                else:
+                    raise Exception("Java AES returned no output")
+                    
             except:
-                # Any Java error, use Python fallback
-                pass
-            
-            # Use Python fallback if Java failed or produced no output
-            if output_data is None:
-                output_data = aes_fallback(operation, message, key)
+                # Python fallback if Java fails
+                try:
+                    output_data = aes_fallback(operation, message, key)
+                    
+                    # Check if Python fallback succeeded
+                    if not output_data or output_data.get('finalResult', '').startswith('Error'):
+                        raise Exception("Python fallback also failed")
+                        
+                except:
+                    # Both failed
+                    pass
             
             # Process the output_data (whether from Java or Python fallback)
             if output_data:
@@ -528,6 +547,86 @@ def aes_view(request):
                 context['error'] = "Failed to process AES operation."
 
     return render(request, 'aes.html', context)
+
+@csrf_exempt
+def aes_process_api(request):
+    """API endpoint for AES processing with Java primary and Python fallback."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST requests are allowed.'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        message = data.get('message', '')
+        key = data.get('key', '')
+        operation = data.get('operation', 'encrypt')
+
+        if not message or not key:
+            return JsonResponse({'error': 'Message and Key are required.'}, status=400)
+        elif len(key) != 16:
+            return JsonResponse({'error': 'AES key must be exactly 16 characters long.'}, status=400)
+
+        output_data = None
+        try:
+            # Use Java implementation as primary
+            java_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'Algorithm', 'Crypto_Native', 'JAVA')
+            java_file = os.path.join(java_dir, 'AES.java')
+            class_file = os.path.join(java_dir, 'AES.class')
+            
+            # Compile Java file if class doesn't exist or is older than source
+            if not os.path.exists(class_file) or os.path.getmtime(java_file) > os.path.getmtime(class_file):
+                compile_result = subprocess.run(['javac', java_file], capture_output=True, text=True)
+                if compile_result.returncode != 0:
+                    raise Exception(f"Java compilation failed: {compile_result.stderr}")
+            
+            # Run the Java program
+            command = ['java', '-cp', java_dir, 'AES', message, key, operation]
+            result = subprocess.run(command, capture_output=True, text=True, check=True, encoding='utf-8')
+            
+            if result.stdout.strip():
+                output_data = json.loads(result.stdout.strip())
+            else:
+                raise Exception("Java AES returned no output")
+                
+        except Exception as e:
+            # Python fallback if Java fails
+            try:
+                output_data = aes_fallback(operation, message, key)
+                
+                # Check if Python fallback succeeded
+                if not output_data or output_data.get('finalResult', '').startswith('Error'):
+                    raise Exception("Python fallback also failed")
+                    
+            except Exception as python_e:
+                # Both failed
+                pass
+        
+        # Process the output_data for visualization
+        if output_data:
+            blocks_data = output_data.get('blocks', [])
+            for block in blocks_data:
+                rounds_data = block.get('rounds', [])
+                for round_info in rounds_data:
+                    # Create a list of items to avoid modifying dict during iteration
+                    items_to_process = list(round_info.items())
+                    for step, hex_val in items_to_process:
+                        if step != 'round' and isinstance(hex_val, str) and len(hex_val) == 32:
+                            round_info[f'{step}_grid'] = format_state_to_grid(hex_val)
+
+            return JsonResponse({
+                'result': output_data.get('finalResult', 'Processing completed'),
+                'blocks_data': blocks_data,
+                'operation': operation
+            })
+        else:
+            return JsonResponse({'error': 'Failed to process AES operation.'}, status=500)
+
+    except Exception as e:
+        # Final fallback to Python
+        try:
+            result_text = aes_fallback(operation, message, key)
+            return JsonResponse({'result': result_text.get('finalResult', 'Processing completed')})
+        except Exception as fallback_error:
+            return JsonResponse({'error': f'All implementations failed. Error: {str(e)}. Fallback error: {str(fallback_error)}'}, status=500)
 
 
 def md5_view(request):
