@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b&^&six7-$gf@v_bf^wk7x3&*0+atq0isc%^t!1(832z*a1qvj'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-for-development-only')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -148,14 +148,12 @@ EMAIL_USE_TLS = True
 
 # Replace these with your actual email credentials
 # For security, you should use environment variables in production
-EMAIL_HOST_USER = 'omshrav@gmail.com'  # Your actual Gmail address
-EMAIL_HOST_PASSWORD = 'dtyd zisr xkcy uiqb'  # Your Gmail App Password from Google
-DEFAULT_FROM_EMAIL = 'AlgoVault <omshrav@gmail.com>'  # Should match EMAIL_HOST_USER
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')   # Your actual Gmail address
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')   # Your Gmail App Password from Google
+DEFAULT_FROM_EMAIL = f'AlgoVault <{os.getenv("EMAIL_HOST_USER", "")}>' # Should match EMAIL_HOST_USER
 
 # For development/testing, you can use console backend to see emails in terminal:
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # AI API Configuration
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
-
-
