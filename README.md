@@ -46,8 +46,8 @@
       <td><strong>200+</strong> (dynamically generated)</td>
     </tr>
     <tr>
-      <td>⚡ API Endpoints</td>
-      <td><strong>15+</strong></td>
+      <td>⚡ JSON API Endpoints</td>
+      <td><strong>10</strong></td>
     </tr>
     <tr>
       <td>🛡️ Security Features</td>
