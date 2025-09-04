@@ -484,7 +484,7 @@ SecurityAlert
 
 ## 🌐 API Documentation
 
-### RESTful Endpoints
+### JSON API Endpoints
 
 All algorithm processing endpoints accept POST requests with JSON payloads:
 
