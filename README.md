@@ -22,35 +22,35 @@
       <th>Count</th>
     </tr>
     <tr>
-      <td>📝 Total Lines of Code</td>
+      <td> Total Lines of Code</td>
       <td><strong>12,500+</strong></td>
     </tr>
     <tr>
-      <td>🔧 Cryptographic Algorithms</td>
+      <td> Cryptographic Algorithms</td>
       <td><strong>9</strong></td>
     </tr>
     <tr>
-      <td>💻 Programming Languages</td>
+      <td> Programming Languages</td>
       <td><strong>5</strong> (Python, C++, Java, JavaScript, HTML/CSS)</td>
     </tr>
     <tr>
-      <td>📁 Project Files</td>
+      <td> Project Files</td>
       <td><strong>100+</strong></td>
     </tr>
     <tr>
-      <td>🎨 HTML Templates</td>
+      <td> HTML Templates</td>
       <td><strong>20+</strong></td>
     </tr>
     <tr>
-      <td>🤖 AI Quiz Questions</td>
+      <td> AI Quiz Questions</td>
       <td><strong>200+</strong> (dynamically generated)</td>
     </tr>
     <tr>
-      <td>⚡ JSON API Endpoints</td>
+      <td> JSON API Endpoints</td>
       <td><strong>10</strong></td>
     </tr>
     <tr>
-      <td>🛡️ Security Features</td>
+      <td> Security Features</td>
       <td><strong>5</strong> (Rate limiting, Input validation, CSRF, Session tracking, Content filtering)</td>
     </tr>
   </table>
